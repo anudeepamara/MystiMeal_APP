@@ -1,0 +1,2108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MystiMeal - Find Your Mystery Meal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Custom styles to replicate Madang's look */
+        body {
+            font-family: 'Roboto', sans-serif; /* Using Roboto */
+            background-color: #f9f9f9; /* Very light background */
+            color: #333;
+            line-height: 1.6;
+        }
+        /* Styling for the scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #999; }
+
+        /* Card styling to resemble Madang's product cards */
+        .restaurant-card {
+            background-color: #fff;
+            border-radius: 4px;
+            box-shadow: 0 1px 5px rgba(0,0,0,0.05); /* Subtle shadow */
+            overflow: hidden;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #eee;
+        }
+        .restaurant-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+        }
+         .restaurant-card img {
+             width: 100%;
+             height: 180px;
+             object-fit: cover;
+         }
+         .restaurant-card .card-content {
+             padding: 15px; /* Adjusted padding */
+             display: flex;
+             flex-direction: column;
+             flex-grow: 1;
+         }
+          .restaurant-card h3 {
+              font-size: 1.1rem;
+              font-weight: 500; /* Medium weight */
+              margin-bottom: 4px;
+              color: #1f2937;
+          }
+           .restaurant-card .restaurant-name {
+               font-size: 0.875rem;
+               color: #6b7280; /* Slightly lighter gray */
+               margin-bottom: 6px;
+           }
+            .restaurant-card .bag-info {
+                 font-size: 0.8rem; /* Slightly larger bag info */
+                 color: #6b7280;
+                 margin-bottom: 8px;
+            }
+            .restaurant-card .price {
+                font-size: 1.2rem; /* Price font size */
+                font-weight: 700;
+                color: #0da487; /* Keeping Freshcart green as an accent for now */
+                margin-top: auto;
+                margin-bottom: 12px;
+            }
+             .restaurant-card .view-details-button {
+                 width: 100%;
+                 background-color: #fff; /* White background */
+                 color: #333;
+                 padding: 10px 16px;
+                 border-radius: 4px;
+                 font-weight: 500;
+                 text-align: center;
+                 transition: all 0.2s ease;
+                 border: 1px solid #d1d5db; /* Light border */
+             }
+             .restaurant-card .view-details-button:hover {
+                 background-color: #f3f4f6; /* Very light gray on hover */
+                 border-color: #cCc;
+             }
+
+
+        /* Category button styling to match Madang's */
+        .category-button {
+            background-color: transparent;
+            color: #555;
+            border: none;
+            padding: 8px 15px; /* Adjusted padding */
+            border-radius: 0; /* No rounding */
+            font-weight: 500;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            font-size: 0.9rem;
+            position: relative; /* For underline positioning */
+        }
+        .category-button.active {
+            color: #0da487;
+            font-weight: 600;
+        }
+         .category-button.active::after {
+             content: '';
+             position: absolute;
+             bottom: -2px; /* Position underline below text */
+             left: 50%; /* Center the underline */
+             transform: translateX(-50%);
+             width: 80%; /* Underline width */
+             height: 2px;
+             background-color: #0da487;
+         }
+         .category-button:hover:not(.active) {
+             color: #0da487;
+         }
+
+
+        /* Primary button style (used for search and modal actions) */
+        .primary-button {
+            background-color: #0da487;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 4px;
+            font-weight: 500; /* Medium weight */
+            transition: background-color 0.2s ease;
+        }
+        .primary-button:hover {
+            background-color: #0a8a72;
+        }
+
+        /* Secondary button style (used for back button) */
+        .secondary-button {
+            background-color: #e5e7eb;
+            color: #4b5563;
+            padding: 12px 24px;
+            border-radius: 4px;
+            font-weight: 500;
+            transition: background-color 0.2s ease;
+        }
+         .secondary-button:hover {
+             background-color: #d1d5db;
+         }
+
+         /* Warning button style (used for remove from cart) */
+        .warning-button {
+             background-color: #ef4444;
+             color: white;
+        }
+        .warning-button:hover {
+             background-color: #dc2626;
+        }
+
+        /* Modal transition effects */
+        .modal { transition: opacity 0.25s ease; }
+        .modal-content { transition: transform 0.25s ease; }
+
+        /* Modal specific styles */
+        .modal-content {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+        }
+        .modal-content h3 {
+            color: #1f2937;
+            font-size: 1.6rem; /* Adjusted modal title size */
+            font-weight: 700;
+        }
+         .menu-item, .bag-size-item {
+            border-bottom: 1px dashed #eee;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+         .menu-item:last-child, .bag-size-item:last-child {
+             border-bottom: none;
+             margin-bottom: 0;
+             padding-bottom: 0;
+         }
+         .add-to-cart-btn {
+             background-color: #0da487;
+             color: white;
+             padding: 6px 14px;
+             border-radius: 4px;
+             font-size: 0.9rem;
+             font-weight: 500;
+             transition: background-color 0.2s ease;
+         }
+         .add-to-cart-btn:hover {
+             background-color: #0a8a72;
+         }
+         .remove-item-btn {
+             background-color: #ef4444;
+             color: white;
+             padding: 4px 10px;
+             border-radius: 4px;
+             font-size: 0.8rem;
+             transition: background-color 0.2s ease;
+         }
+         .remove-item-btn:hover {
+             background-color: #dc2626;
+         }
+         .modal-view {
+             display: none;
+         }
+         .modal-view.active {
+             display: block;
+         }
+
+         /* Specific styles for the login screen to match the overall theme */
+        #loginScreen {
+            background-color: #f9f9f9;
+        }
+        .login-card {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 2.5rem;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+        }
+        .login-card h1 {
+            color: #1f2937;
+            font-size: 2.2rem; /* Adjusted login title size */
+            font-weight: 700;
+        }
+         .login-card .primary-button {
+             padding: 14px 28px;
+             font-size: 1rem;
+         }
+          .phone-input-container {
+              border-color: #ddd;
+              border-radius: 4px;
+          }
+          .phone-input-container span {
+              background-color: #f9f9f9;
+              border-right-color: #ddd;
+          }
+           .phone-input-container input:focus {
+               border-color: #0da487;
+               box-shadow: 0 0 0 1px #0da487;
+           }
+           .login-card p {
+               color: #4b5563;
+           }
+
+        /* Header styling */
+        .app-header {
+            background-color: #ffffff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+            padding-top: 12px;
+            padding-bottom: 12px;
+        }
+         .app-header h1 {
+             font-size: 1.6rem; /* Adjusted header title size */
+             font-weight: 700;
+             color: #1f2937;
+         }
+          .app-header .fa-search, .app-header .fa-user-circle {
+              font-size: 1.1rem;
+              color: #555;
+          }
+           .app-header button:hover .fa-search, .app-header button:hover .fa-user-circle {
+               color: #0da487;
+           }
+
+
+        /* Main content padding */
+        main {
+            padding-top: 30px; /* Adjusted padding */
+            padding-bottom: 30px;
+        }
+         main h2 {
+             font-size: 1.6rem; /* Adjusted greeting size */
+             font-weight: 700;
+             color: #1f2937;
+             margin-bottom: 4px;
+         }
+          main p {
+              color: #4b5563;
+              font-size: 0.9rem;
+          }
+
+        /* Category filter container */
+        .category-filter-container {
+             margin-bottom: 30px; /* Adjusted margin */
+             padding-bottom: 8px;
+             overflow-x: auto;
+             -webkit-overflow-scrolling: touch;
+        }
+         .category-filter-container::-webkit-scrollbar {
+             display: none;
+         }
+
+
+        /* Search bar styling */
+        .search-bar-container {
+            padding: 12px;
+            background-color: #fff;
+            border-radius: 4px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid #eee;
+            margin-bottom: 30px; /* Adjusted margin */
+        }
+         .search-bar-container input {
+             flex-grow: 1;
+             padding: 8px 12px;
+             border: 1px solid #eee;
+             border-radius: 4px;
+             font-size: 0.9rem;
+             color: #333;
+         }
+          .search-bar-container input::placeholder {
+              color: #9ca3af;
+          }
+           .search-bar-container input:focus {
+               outline: none;
+               border-color: #0da487;
+               box-shadow: 0 0 0 1px #0da487;
+           }
+           .search-bar-container .primary-button {
+               padding: 8px 16px;
+               font-size: 0.9rem;
+               border-radius: 4px;
+           }
+
+        /* Bag listings grid */
+        #bagListings {
+             gap: 20px; /* Adjusted gap */
+        }
+
+        /* Cart Suggestions Styling */
+        .suggestions-container {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px dashed #eee;
+        }
+        .suggestions-container h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 10px;
+        }
+        .suggestion-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px dashed #f3f4f6;
+        }
+         .suggestion-item:last-child {
+             border-bottom: none;
+             padding-bottom: 0;
+         }
+        .suggestion-item .item-details {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+         .suggestion-item img {
+             width: 40px;
+             height: 40px;
+             object-fit: cover;
+             border-radius: 4px;
+         }
+         .suggestion-item .item-info span {
+             display: block;
+             font-size: 0.875rem;
+             color: #333;
+         }
+          .suggestion-item .item-info .price {
+              font-size: 0.8rem;
+              color: #6b7280;
+          }
+        .suggestion-item .add-button {
+            background-color: #0da487;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: background-color 0.2s ease;
+        }
+         .suggestion-item .add-button:hover {
+             background-color: #0a8a72;
+         }
+
+         /* Checkout Address and Payment Styling (based on uploaded image) */
+         .checkout-section {
+             margin-bottom: 20px;
+             padding: 15px;
+             background-color: #fff;
+             border-radius: 8px;
+             box-shadow: 0 1px 5px rgba(0,0,0,0.05);
+             border: 1px solid #eee;
+         }
+          .checkout-section h4 {
+              font-size: 1.1rem;
+              font-weight: 600;
+              color: #1f2937;
+              margin-bottom: 15px;
+          }
+           .checkout-section label {
+               font-size: 0.875rem;
+               font-weight: 500;
+               color: #333;
+               display: block;
+               margin-bottom: 6px;
+           }
+            .checkout-section input[type="text"],
+            .checkout-section textarea,
+            .checkout-section select {
+                width: 100%;
+                padding: 10px 12px;
+                border: 1px solid #d1d5db;
+                border-radius: 4px;
+                font-size: 0.9rem;
+                color: #333;
+                transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            }
+             .checkout-section input[type="text"]:focus,
+             .checkout-section textarea:focus,
+             .checkout-section select:focus {
+                 outline: none;
+                 border-color: #0da487;
+                 box-shadow: 0 0 0 1px rgba(13, 164, 135, 0.2); /* Subtle green glow */
+             }
+             .checkout-section textarea {
+                 min-height: 80px;
+                 resize: vertical;
+             }
+
+            .payment-method-option {
+                display: flex;
+                align-items: center;
+                margin-bottom: 10px;
+            }
+             .payment-method-option input[type="radio"] {
+                 margin-right: 10px;
+                 accent-color: #0da487; /* Style radio button with accent color */
+             }
+              .payment-method-option label {
+                  margin-bottom: 0; /* Remove bottom margin for label */
+                  font-weight: 400; /* Normal weight */
+                  color: #4b5563;
+              }
+
+              /* Styling for the Pickup/Delivery radio buttons */
+              .delivery-option {
+                  display: flex;
+                  align-items: center;
+                  margin-bottom: 10px;
+              }
+               .delivery-option input[type="radio"] {
+                   margin-right: 10px;
+                   accent-color: #0da487;
+               }
+                .delivery-option label {
+                    margin-bottom: 0;
+                    font-weight: 400;
+                    color: #4b5563;
+                }
+
+               /* Styling for Delivery Priority options */
+               .delivery-priority-option {
+                   display: flex;
+                   align-items: center;
+                   margin-bottom: 10px;
+               }
+                .delivery-priority-option input[type="radio"] {
+                    margin-right: 10px;
+                    accent-color: #0da487;
+                }
+                 .delivery-priority-option label {
+                     margin-bottom: 0;
+                     font-weight: 400;
+                     color: #4b5563;
+                 }
+                 .delivery-priority-option .extra-charge {
+                     font-size: 0.8rem;
+                     color: #6b7280;
+                     margin-left: 5px;
+                 }
+
+            /* User Account Screen Styles */
+            #userAccountScreen {
+                background-color: #f9f9f9;
+                padding-top: 20px;
+            }
+             #userAccountScreen h2 {
+                 font-size: 1.8rem;
+                 font-weight: 700;
+                 color: #1f2937;
+                 margin-bottom: 20px;
+             }
+              .account-section {
+                  margin-bottom: 30px;
+                  padding: 20px;
+                  background-color: #fff;
+                  border-radius: 8px;
+                  box-shadow: 0 1px 5px rgba(0,0,0,0.05);
+                  border: 1px solid #eee;
+              }
+               .account-section h3 {
+                   font-size: 1.4rem;
+                   font-weight: 600;
+                   color: #1f2937;
+                   margin-bottom: 15px;
+                   border-bottom: 1px dashed #eee;
+                   padding-bottom: 10px;
+               }
+
+               /* Order History Styles */
+               .order-item {
+                   border-bottom: 1px solid #eee;
+                   padding: 15px 0;
+               }
+                .order-item:last-child {
+                    border-bottom: none;
+                }
+               .order-item .order-header {
+                   display: flex;
+                   justify-content: space-between;
+                   align-items: center;
+                   margin-bottom: 10px;
+               }
+                .order-item .order-header .restaurant-name {
+                    font-weight: 600;
+                    color: #1f2937;
+                }
+                 .order-item .order-header .order-date {
+                     font-size: 0.8rem;
+                     color: #6b7280;
+                 }
+                .order-item .order-details {
+                    font-size: 0.9rem;
+                    color: #4b5563;
+                    margin-bottom: 10px;
+                }
+                 .order-item .order-total {
+                     font-weight: 600;
+                     color: #0da487;
+                 }
+                  .order-item .order-status {
+                      font-size: 0.8rem;
+                      font-weight: 600;
+                      padding: 4px 8px;
+                      border-radius: 4px;
+                  }
+                   .order-item .order-status.delivered {
+                       background-color: #d1fae5;
+                       color: #065f46;
+                   }
+                    .order-item .order-status.pending {
+                        background-color: #fef3c7;
+                        color: #92400e;
+                    }
+                    .order-item .order-status.cancelled {
+                        background-color: #fee2e2;
+                        color: #991b1b;
+                    }
+
+
+               /* Profile Management Styles */
+               .profile-form .form-group {
+                   margin-bottom: 15px;
+               }
+                .profile-form label {
+                    font-size: 0.875rem;
+                    font-weight: 500;
+                    color: #333;
+                    display: block;
+                    margin-bottom: 6px;
+                }
+                 .profile-form input[type="text"],
+                 .profile-form input[type="email"],
+                 .profile-form input[type="tel"] {
+                     width: 100%;
+                     padding: 10px 12px;
+                     border: 1px solid #d1d5db;
+                     border-radius: 4px;
+                     font-size: 0.9rem;
+                     color: #333;
+                     transition: border-color 0.2s ease, box-shadow 0.2s ease;
+                 }
+                  .profile-form input[type="text"]:focus,
+                  .profile-form input[type="email"]:focus,
+                  .profile-form input[type="tel"]:focus {
+                      outline: none;
+                      border-color: #0da487;
+                      box-shadow: 0 0 0 1px rgba(13, 164, 135, 0.2);
+                  }
+                 .profile-form .save-button {
+                     background-color: #0da487;
+                     color: white;
+                     padding: 10px 20px;
+                     border-radius: 4px;
+                     font-weight: 500;
+                     transition: background-color 0.2s ease;
+                 }
+                  .profile-form .save-button:hover {
+                      background-color: #0a8a72;
+                  }
+
+               /* Persistent Cart Styles */
+               .persistent-cart-item {
+                   border-bottom: 1px solid #eee;
+                   padding: 15px 0;
+               }
+                .persistent-cart-item:last-child {
+                    border-bottom: none;
+                }
+                .persistent-cart-item .item-details {
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    margin-bottom: 10px;
+                }
+                 .persistent-cart-item img {
+                     width: 50px;
+                     height: 50px;
+                     object-fit: cover;
+                     border-radius: 4px;
+                 }
+                  .persistent-cart-item .item-info span {
+                      display: block;
+                      font-size: 0.9rem;
+                      color: #333;
+                  }
+                   .persistent-cart-item .item-info .price {
+                       font-size: 0.8rem;
+                       color: #6b7280;
+                   }
+               .persistent-cart-actions {
+                   display: flex;
+                   gap: 10px;
+                   justify-content: flex-end;
+               }
+                .persistent-cart-actions button {
+                    padding: 6px 12px;
+                    border-radius: 4px;
+                    font-size: 0.8rem;
+                    font-weight: 500;
+                    transition: background-color 0.2s ease;
+                }
+                 .persistent-cart-actions .continue-button {
+                     background-color: #0da487;
+                     color: white;
+                 }
+                  .persistent-cart-actions .continue-button:hover {
+                      background-color: #0a8a72;
+                  }
+                 .persistent-cart-actions .clear-button {
+                     background-color: #ef4444;
+                     color: white;
+                 }
+                  .persistent-cart-actions .clear-button:hover {
+                      background-color: #dc2626;
+                  }
+
+                /* Order Progress Styles */
+                #orderProgressView {
+                    background-color: #f9f9f9;
+                    padding-top: 20px;
+                }
+                 #orderProgressView h2 {
+                     font-size: 1.8rem;
+                     font-weight: 700;
+                     color: #1f2937;
+                     margin-bottom: 20px;
+                 }
+                  .progress-section {
+                      margin-bottom: 20px;
+                      padding: 20px;
+                      background-color: #fff;
+                      border-radius: 8px;
+                      box-shadow: 0 1px 5px rgba(0,0,0,0.05);
+                      border: 1px solid #eee;
+                  }
+                   .progress-section h3 {
+                       font-size: 1.4rem;
+                       font-weight: 600;
+                       color: #1f2937;
+                       margin-bottom: 15px;
+                       border-bottom: 1px dashed #eee;
+                       padding-bottom: 10px;
+                   }
+                   .progress-step {
+                       display: flex;
+                       align-items: center;
+                       margin-bottom: 15px;
+                   }
+                    .progress-step .icon {
+                        width: 30px;
+                        height: 30px;
+                        border-radius: 50%;
+                        background-color: #eee;
+                        color: #888;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        margin-right: 15px;
+                        font-size: 0.9rem;
+                    }
+                     .progress-step.completed .icon {
+                         background-color: #0da487;
+                         color: white;
+                     }
+                    .progress-step .text span {
+                        display: block;
+                        font-size: 0.9rem;
+                        color: #333;
+                    }
+                     .progress-step .text .status {
+                         font-size: 0.8rem;
+                         color: #6b7280;
+                     }
+                    .progress-line {
+                        width: 2px;
+                        background-color: #eee;
+                        margin-left: 14px; /* Align with icon center */
+                        height: 20px;
+                    }
+                     .progress-step:last-child .progress-line {
+                         display: none;
+                     }
+
+
+            /* Map Placeholder Styling */
+            .map-placeholder {
+                width: 100%;
+                height: 200px; /* Or adjust as needed */
+                background-color: #e0e0e0; /* Gray background */
+                border-radius: 4px;
+                margin-bottom: 15px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #555;
+                font-size: 1rem;
+                border: 1px solid #ccc;
+            }
+
+    </style>
+</head>
+<body class="antialiased">
+
+    <div id="loginScreen" class="fixed inset-0 z-50 flex flex-col items-center justify-center p-4">
+        <div class="login-card text-center w-full max-w-sm">
+            <img src="https://placehold.co/100x100/0da487/ffffff?text=MystiMeal&font=Roboto" alt="MystiMeal Logo" class="mx-auto mb-6 rounded-full">
+            <h1 class="text-4xl font-bold text-gray-800 mb-3">MystiMeal</h1>
+            <p class="text-gray-600 mb-8">Save food. Save money. Stay curious.</p>
+            <p class="text-left text-sm text-gray-500 mb-2">Enter your phone number to sign in</p>
+            <div class="phone-input-container mb-8">
+                <span>🇮🇳 +91</span> <input type="tel" placeholder="9876543210" class="w-full"> </div>
+            <button id="loginContinueButton" class="w-full primary-button font-semibold py-3 px-6 rounded-lg shadow-md transition duration-150">
+                Continue
+            </button>
+            <p class="text-xs text-gray-400 mt-6">By continuing, you agree to our <a href="#" class="underline text-gray-500 hover:text-gray-700">Terms and Conditions</a></p>
+        </div>
+    </div>
+
+    <div id="mainAppContent" class="">
+        <header class="app-header sticky top-0 z-40">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+                <h1 class="text-3xl font-bold tracking-tight text-gray-800">MystiMeal</h1>
+                <div class="flex items-center space-x-4">
+                    <button class="text-gray-600 hover:text-0da487" onclick="showUserAccount()">
+                        <i class="fas fa-user-circle text-2xl"></i> </button>
+                </div>
+            </div>
+        </header>
+
+        <div id="mainListingView">
+             <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                 <div class="mb-8">
+                     <h2 class="text-2xl sm:text-3xl font-bold text-gray-800">Good afternoon, User!</h2>
+                     <p class="text-gray-600 mt-1">Discover Surprise Bags Near You - Hyderabad</p>
+                 </div>
+
+                 <div class="category-filter-container mb-8 flex space-x-4 -mx-4 px-4 sm:mx-0 sm:px-0">
+                     <button data-category="All" class="category-button active font-medium whitespace-nowrap">All</button>
+                     <button data-category="Restaurants" class="category-button font-medium whitespace-nowrap">Restaurants</button>
+                     <button data-category="Biryani" class="category-button font-medium whitespace-nowrap">Biryani</button>
+                     <button data-category="Bakery" class="category-button font-medium whitespace-nowrap">Bakery</button>
+                     <button data-category="Cafe" class="category-button font-medium whitespace-nowrap">Cafe</button>
+                     <button data-category="Fast Food" class="category-button font-medium whitespace-nowrap">Fast Food</button>
+                      <button data-category="Sweets" class="category-button font-medium whitespace-nowrap">Sweets</button>
+                      <button data-category="Meals" class="category-button font-medium whitespace-nowrap">Meals</button>
+                 </div>
+
+                 <div class="mb-8 search-bar-container">
+                     <input type="text" id="restaurantSearchInput" placeholder="Search by restaurant or bag name...">
+                     <button id="searchButton" class="primary-button font-semibold shadow-md transition duration-150">
+                         Search
+                     </button>
+                 </div>
+
+                 <div id="bagListings" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                     </div>
+             </main>
+        </div>
+
+        <div id="userAccountScreen" class="hidden container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <button class="secondary-button mb-8" onclick="showMainListing()">Back to Listings</button>
+            <h2>My Account</h2>
+
+            <div id="persistentCart" class="account-section">
+                <h3>Your Cart (<span id="persistentCartItemCount">0</span> items)</h3>
+                <div id="persistentCartItems" class="space-y-3">
+                    <p class="text-center text-gray-500">Your persistent cart is empty.</p>
+                </div>
+                 <div id="persistentCartActions" class="persistent-cart-actions mt-4 hidden">
+                     <button class="continue-button" onclick="continueWithPersistentCart()">Continue with this Cart</button>
+                     <button class="clear-button" onclick="clearPersistentCart()">Clear Cart</button>
+                 </div>
+            </div>
+
+            <div id="orderHistory" class="account-section">
+                <h3>Order History</h3>
+                <div id="orderHistoryItems" class="space-y-4">
+                    <p class="text-center text-gray-500">No past orders found.</p>
+                </div>
+            </div>
+
+            <div id="userProfile" class="account-section">
+                <h3>Profile Information</h3>
+                <div class="profile-form space-y-4">
+                    <div class="form-group">
+                        <label for="profileName">Name:</label>
+                        <input type="text" id="profileName" value="User Name">
+                    </div>
+                    <div class="form-group">
+                        <label for="profilePhone">Phone:</label>
+                        <input type="tel" id="profilePhone" value="+91 9876543210">
+                    </div>
+                    <div class="form-group">
+                        <label for="profileEmail">Email:</label>
+                        <input type="email" id="profileEmail" value="user@example.com">
+                    </div>
+                     <div class="form-group">
+                         <label for="profileAddress">Default Address:</label>
+                         <input type="text" id="profileAddress" value="123 Main St, Hyderabad">
+                     </div>
+                    <button class="save-button" onclick="saveProfile()">Save Profile</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="orderProgressView" class="hidden container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+             <button class="secondary-button mb-8" onclick="showUserAccount()">Back to Account</button>
+             <h2>Order Progress</h2>
+             <div class="progress-section">
+                 <h3>Order #<span id="currentOrderId"></span></h3>
+                 <div class="progress-steps">
+                     <div class="progress-step completed">
+                         <div class="icon"><i class="fas fa-check"></i></div>
+                         <div class="text">
+                             <span>Order Placed</span>
+                             <span class="status">We've received your order.</span>
+                         </div>
+                     </div>
+                     <div class="progress-line"></div>
+                     <div class="progress-step" id="stepPreparation">
+                         <div class="icon"><i class="fas fa-utensils"></i></div>
+                         <div class="text">
+                             <span>Preparing Your Order</span>
+                             <span class="status">The restaurant is getting your meal ready.</span>
+                         </div>
+                     </div>
+                      <div class="progress-line"></div>
+                     <div class="progress-step" id="stepOutForDelivery">
+                         <div class="icon"><i class="fas fa-motorcycle"></i></div>
+                         <div class="text">
+                             <span>Out for Delivery/Ready for Pickup</span>
+                             <span class="status">Your order is on its way or ready.</span>
+                         </div>
+                     </div>
+                      <div class="progress-line"></div>
+                     <div class="progress-step" id="stepDelivered">
+                         <div class="icon"><i class="fas fa-box-open"></i></div>
+                         <div class="text">
+                             <span>Delivered/Picked Up</span>
+                             <span class="status">Enjoy your MystiMeal!</span>
+                         </div>
+                     </div>
+                 </div>
+                 <p id="orderStatusMessage" class="text-center mt-6 text-lg font-semibold text-gray-700"></p>
+             </div>
+        </div>
+
+
+        <div id="bagDetailModal" class="modal fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 opacity-0 pointer-events-none p-4">
+            <div class="modal-content bg-white rounded-xl shadow-2xl w-full max-w-md p-6 transform scale-95 max-h-[90vh] overflow-y-auto">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 id="modalRestaurantTitle" class="text-2xl font-bold text-gray-800">Restaurant Name</h3>
+                    <button id="closeModalButton" class="text-gray-500 hover:text-gray-700 text-3xl leading-none">&times;</button>
+                </div>
+
+                <div id="bagMenuDetailView" class="modal-view active">
+                    <img id="modalRestaurantImage" src="" alt="Restaurant Image" class="w-full h-48 object-cover rounded-lg mb-4 shadow">
+
+                    <div class="mb-6">
+                        <h4 class="text-lg font-semibold text-gray-700 mb-2">Surprise Bags</h4>
+                        <div id="modalBagSizes" class="space-y-3">
+                            </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <p class="font-semibold text-gray-700 mb-1">Available Pickup Times:</p>
+                        <div id="modalPickupTimes" class="flex flex-wrap gap-2">
+                            </div>
+                    </div>
+
+                    <div class="mt-4 border-t pt-4">
+                        <h4 class="text-lg font-semibold text-gray-700 mb-2">Full Restaurant Menu (Sample)</h4>
+                        <div id="modalFullMenu" class="text-sm text-gray-600 space-y-1">
+                            </div>
+                    </div>
+                </div>
+
+                <div id="cartView" class="modal-view">
+                     <h4 class="text-lg font-semibold text-gray-700 mb-4">Your Cart</h4>
+                     <div id="cartItems" class="space-y-3">
+                         </div>
+                     <div id="cartTotal" class="text-lg font-bold text-gray-800 mt-4 text-right">
+                         Total: ₹0 </div>
+
+                     <div id="cartSuggestions" class="suggestions-container">
+                         </div>
+                </div>
+
+                <div id="checkoutAddressView" class="modal-view">
+                     <div class="checkout-section">
+                         <h4>Choose Delivery Option</h4>
+                         <div class="space-y-4">
+                             <div class="delivery-option">
+                                 <input type="radio" name="deliveryOption" value="pickup" id="optionPickup" checked>
+                                 <label for="optionPickup">Pickup</label>
+                             </div>
+                             <div class="delivery-option">
+                                 <input type="radio" name="deliveryOption" value="delivery" id="optionDelivery">
+                                 <label for="optionDelivery">Delivery</label>
+                             </div>
+                         </div>
+                     </div>
+
+                     <div id="deliveryAddressFields" class="checkout-section mt-4 hidden">
+                         <h4>Delivery Details</h4>
+                         <div class="space-y-4">
+                             <div class="map-placeholder">
+                                 Map Placeholder - Click to Select Address
+                             </div>
+                             <div>
+                                 <label for="address">Delivery Address</label>
+                                 <input type="text" id="address" placeholder="Enter your delivery address">
+                             </div>
+                             <div>
+                                 <label for="dropoff">Dropoff Instructions (Optional)</label>
+                                 <textarea id="dropoff" rows="3" placeholder="e.g., Leave at door, Ring doorbell"></textarea>
+                             </div>
+                         </div>
+                     </div>
+                </div>
+
+                <div id="checkoutTimeView" class="modal-view">
+                     <div class="checkout-section">
+                         <h4>Time Preferences</h4>
+                         <div class="space-y-4">
+                              <div>
+                                  <label for="timeZone">Time Zone</label>
+                                  <select id="timeZone">
+                                      <option value="UTC+5:30">India Standard Time (UTC+5:30)</option>
+                                      </select>
+                              </div>
+                             <div>
+                                 <label for="pickupTime">Preferred Time</label>
+                                 <select id="pickupTime">
+                                     </select>
+                             </div>
+                             <p class="text-sm text-gray-500">Note: Surprise bags have specific pickup windows. Full menu orders can be scheduled within restaurant hours.</p>
+                         </div>
+                     </div>
+
+                     <div id="deliveryPrioritySection" class="checkout-section mt-4 hidden">
+                         <h4>Delivery Priority</h4>
+                         <div class="space-y-4">
+                             <div class="delivery-priority-option">
+                                 <input type="radio" name="deliveryPriority" value="regular" id="priorityRegular" checked>
+                                 <label for="priorityRegular">Regular Delivery</label>
+                             </div>
+                             <div class="delivery-priority-option">
+                                 <input type="radio" name="deliveryPriority" value="priority" id="priorityPriority">
+                                 <label for="priorityPriority">Priority Delivery <span class="extra-charge">(+₹50)</span></label>
+                             </div>
+                         </div>
+                     </div>
+                </div>
+
+                 <div id="checkoutPaymentView" class="modal-view">
+                     <div class="checkout-section">
+                         <h4>Payment Method</h4>
+                         <div class="space-y-4">
+                             <div class="payment-method-option">
+                                 <input type="radio" name="paymentMethod" value="card" id="paymentCard">
+                                 <label for="paymentCard">Credit/Debit Card (Simulated)</label>
+                             </div>
+                             <div class="payment-method-option">
+                                 <input type="radio" name="paymentMethod" value="upi" id="paymentUpi">
+                                 <label for="paymentUpi">UPI (Simulated)</label>
+                             </div>
+                             <div class="payment-method-option">
+                                  <input type="radio" name="paymentMethod" value="cod" id="paymentCod">
+                                  <label for="paymentCod">Cash on Delivery (Simulated)</label>
+                              </div>
+                         </div>
+                     </div>
+                 </div>
+
+
+                <div class="mt-6 flex flex-col sm:flex-row gap-3">
+                     <button id="modalBackButton" class="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-3 px-4 rounded-lg shadow-md transition duration-150 hidden">
+                         Back
+                     </button>
+                     <button id="modalActionButton" class="w-full primary-button font-semibold py-3 px-4 rounded-lg shadow-md transition duration-150">
+                         View Cart (<span id="cartItemCount">0</span>) </button>
+                </div>
+                <p id="modalMessage" class="text-center mt-4 text-sm text-gray-500"></p>
+            </div>
+        </div>
+
+        <footer class="bg-gray-800 text-white py-8 mt-12">
+            <div class="container mx-auto px-4 text-center">
+                <p>&copy; 2025 MystiMeal. All rights reserved.</p>
+                <p class="text-sm text-gray-400">Saving food, one mystery bag at a time.</p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Sample data for mystery bags and menu items
+        const mysteryBagsData = [
+            {
+                id: 1,
+                bagName: "Biryani Surprise",
+                restaurantName: "Pista House",
+                location: "Hyderabad",
+                category: "Biryani", // Specific category
+                imageUrl: "https://placehold.co/600x400/FF8C00/FFF7ED?text=Pista+House+Biryani&font=Roboto", // Updated font in placeholder
+                bagSizes: [
+                     { id: 'bag-1-small', size: 'Small', type: 'Small Surprise Biryani Bag', description: 'A smaller portion of surplus biryani.', price: '₹99' },
+                     { id: 'bag-1-medium', size: 'Medium', type: 'Medium Surprise Biryani Bag', description: 'A good portion of surplus biryani.', price: '₹149' },
+                     { id: 'bag-1-large', size: 'Large', type: 'Large Surprise Biryani Bag', description: 'A generous portion of surplus biryani.', price: '₹199' }
+                ],
+                availableTimes: [{start: "1:00 PM", end: "3:00 PM"}, {start: "8:00 PM", end: "10:00 PM"}],
+                fullMenu: [
+                    {id: 'menu-item-1-1', name: "Chicken Dum Biryani", price: "₹280"},
+                    {id: 'menu-item-1-2', name: "Mutton Dum Biryani", price: "₹350"},
+                    {id: 'menu-item-1-3', name: "Veg Biryani", price: "₹220"},
+                    {id: 'menu-item-1-4', name: "Double Ka Meetha", price: "₹120"}
+                ]
+            },
+            {
+                id: 2,
+                bagName: "Cafe Bites Box",
+                restaurantName: "The Brew Room",
+                location: "Hyderabad",
+                category: "Cafe", // Specific category
+                imageUrl: "https://placehold.co/600x400/4682B4/FFF7ED?text=Brew+Room+Cafe&font=Roboto", // Updated font in placeholder
+                 bagSizes: [
+                     { id: 'bag-2-standard', size: 'Standard', type: 'Breakfast Combo', description: 'A surprise assortment of our popular breakfast items.', price: '₹99' }
+                 ],
+                availableTimes: [{start: "9:00 AM", end: "11:00 AM"}],
+                fullMenu: [
+                    {id: 'menu-item-2-1', name: "English Breakfast", price: "₹300"},
+                    {id: 'menu-item-2-2', name: "Pancakes", price: "₹200"},
+                    {id: 'menu-item-2-3', name: "Coffee", price: "₹150"}
+                ]
+            },
+            {
+                id: 3,
+                bagName: "Sweet Bakery Treats",
+                restaurantName: "Sweet Surrender Bakery",
+                location: "Hyderabad",
+                category: "Bakery", // Specific category
+                imageUrl: "https://placehold.co/600x400/FFC0CB/333?text=Sweet+Surrender+Bakery&font=Roboto", // Updated font in placeholder
+                 bagSizes: [
+                     { id: 'bag-3-standard', size: 'Standard', type: 'Pastry Assortment', description: 'A delightful selection of leftover pastries.', price: '₹75' }
+                 ],
+                availableTimes: [{start: "4:00 PM", end: "6:00 PM"}, {start: "8:00 PM", end: "9:00 PM"}],
+                fullMenu: [
+                    {id: 'menu-item-3-1', name: "Chocolate Croissant", price: "₹100"},
+                    {id: 'menu-item-3-2', name: "Red Velvet Pastry", price: "₹150"},
+                    {id: 'menu-item-3-3', name: "Assorted Cookies (Box)", price: "₹250"}
+                ]
+            },
+            {
+                id: 4,
+                bagName: "Quick Snack Pack",
+                restaurantName: "Quick Bites Cafe",
+                location: "Hyderabad",
+                category: "Fast Food", // Specific category
+                imageUrl: "https://placehold.co/600x400/32CD32/FFF7ED?text=Quick+Bites+Cafe&font=Roboto", // Updated font in placeholder
+                 bagSizes: [
+                     { id: 'bag-4-standard', size: 'Standard', type: 'Mixed Snacks', description: 'A surprise bag filled with snacks.', price: '₹60' }
+                 ],
+                availableTimes: [{start: "3:00 PM", end: "5:00 PM"}],
+                fullMenu: [
+                    {id: 'menu-item-4-1', name: "Veg Sandwich", price: "₹80"},
+                    {id: 'menu-item-4-2', name: "French Fries", price: "₹100"},
+                    {id: 'menu-item-4-3', name: "Milkshake", price: "₹120"}
+                ]
+            },
+            {
+                id: 5,
+                bagName: "Oven Story Pizza Bag",
+                restaurantName: "Oven Story Pizza",
+                location: "Hyderabad",
+                category: "Fast Food", // Specific category
+                imageUrl: "https://placehold.co/600x400/FF4500/FFF7ED?text=Oven+Story+Pizza&font=Roboto", // Updated font in placeholder
+                 bagSizes: [
+                     { id: 'bag-5-standard', size: 'Standard', type: 'Pizza Slice Combo', description: 'Get 2 large surprise slices.', price: '₹120' }
+                 ],
+                availableTimes: [{start: "12:00 PM", end: "2:00 PM"}, {start: "7:00 PM", end: "9:00 PM"}],
+                fullMenu: [
+                    {id: 'menu-item-5-1', name: "Margherita Pizza", price: "₹250"},
+                    {id: 'menu-item-5-2', name: "Farmhouse Pizza", price: "₹350"},
+                    {id: 'menu-item-5-3', name: "Garlic Bread", price: "₹130"}
+                ]
+            },
+             {
+                id: 6,
+                bagName: "Assorted Sweets Box",
+                restaurantName: "Gourmet Sweets",
+                location: "Hyderabad",
+                category: "Sweets", // Specific category
+                imageUrl: "https://placehold.co/600x400/FFB6C1/333?text=Gourmet+Sweets&font=Roboto", // Updated font in placeholder
+                 bagSizes: [
+                     { id: 'bag-6-small', size: 'Small', type: 'Small Sweets Box', description: 'A small selection of daily leftover sweets.', price: '₹150' },
+                     { id: 'bag-6-large', size: 'Large', type: 'Large Sweets Box', description: 'A larger assortment of fresh sweets.', price: '₹250' }
+                 ],
+                availableTimes: [{start: "6:00 PM", end: "8:00 PM"}],
+                fullMenu: [
+                    {id: 'menu-item-6-1', name: "Gulab Jamun (4 pcs)", price: "₹100"},
+                    {id: 'menu-item-6-2', name: "Rasgulla (4 pcs)", price: "₹100"},
+                    {id: 'menu-item-6-3', name: "Assorted Barfi (250g)", price: "₹200"}
+                ]
+            },
+             {
+                id: 7,
+                bagName: "Curry & Roti Pack",
+                restaurantName: "Spice Junction",
+                location: "Hyderabad",
+                category: "Meals", // General Meals category for other dishes
+                imageUrl: "https://placehold.co/600x400/A0522D/FFF7ED?text=Spice+Junction&font=Roboto", // Updated font in placeholder
+                 bagSizes: [
+                     { id: 'bag-7-standard', size: 'Standard', type: 'Curry & Roti Surprise', description: 'A surprise curry with rotis.', price: '₹120' }
+                 ],
+                availableTimes: [{start: "7:30 PM", end: "9:30 PM"}],
+                fullMenu: [
+                    {id: 'menu-item-7-1', name: "Butter Chicken", price: "₹300"},
+                    {id: 'menu-item-7-2', name: "Dal Makhani", price: "₹250"},
+                    {id: 'menu-item-7-3', name: "Naan", price: "₹50"},
+                    {id: 'menu-item-7-4', name: "Jeera Rice", price: "₹150"}
+                ]
+            }
+        ];
+
+         // Sample data for cart suggestions (can be items from other restaurants or popular items)
+         const cartSuggestionsData = [
+             { id: 101, name: "Garlic Bread", price: "₹130", imageUrl: "https://placehold.co/80x80/FF4500/FFF7ED?text=Garlic+Bread&font=Roboto" },
+             { id: 102, name: "Cold Coffee", price: "₹150", imageUrl: "https://placehold.co/80x80/4682B4/FFF7ED?text=Cold+Coffee&font=Roboto" },
+             { id: 103, name: "Samosa (2 pcs)", price: "₹50", imageUrl: "https://placehold.co/80x80/32CD32/FFF7ED?text=Samosa&font=Roboto" }
+         ];
+
+        // Simulated User Data and Order History (will be stored in localStorage)
+        let userData = JSON.parse(localStorage.getItem('mystimealUserData')) || {
+            name: 'User Name',
+            phone: '+91 9876543210',
+            email: 'user@example.com',
+            address: '123 Main St, Hyderabad'
+        };
+
+        let orderHistory = JSON.parse(localStorage.getItem('mystimealOrderHistory')) || [];
+
+        // Get references to key DOM elements for easier access
+        const mainListingView = document.getElementById('mainListingView'); // Reference to the main listing view
+        const userAccountScreen = document.getElementById('userAccountScreen'); // Reference to the user account screen
+        const orderProgressView = document.getElementById('orderProgressView'); // Reference to the order progress view
+
+        const bagListingsContainer = document.getElementById('bagListings');
+        const modal = document.getElementById('bagDetailModal');
+        const closeModalButton = document.getElementById('closeModalButton');
+        const modalRestaurantTitle = document.getElementById('modalRestaurantTitle');
+        const modalRestaurantImage = document.getElementById('modalRestaurantImage');
+        const modalBagSizesContainer = document.getElementById('modalBagSizes');
+        const modalPickupTimesContainer = document.getElementById('modalPickupTimes');
+        const modalFullMenuContainer = document.getElementById('modalFullMenu');
+        const cartItemsContainer = document.getElementById('cartItems');
+        const cartTotalSpan = document.getElementById('cartTotal');
+        const modalActionButton = document.getElementById('modalActionButton');
+        const modalBackButton = document.getElementById('modalBackButton');
+        const cartItemCountSpan = document.getElementById('cartItemCount');
+        const modalMessage = document.getElementById('modalMessage');
+        const cartSuggestionsContainer = document.getElementById('cartSuggestions'); // Reference to suggestions container
+
+        // References to checkout form elements
+        const deliveryOptionRadios = document.querySelectorAll('input[name="deliveryOption"]');
+        const deliveryAddressFields = document.getElementById('deliveryAddressFields');
+        const addressInput = document.getElementById('address');
+        const dropoffTextarea = document.getElementById('dropoff');
+        const timeZoneSelect = document.getElementById('timeZone'); // Reference to time zone select
+        const pickupTimeSelect = document.getElementById('pickupTime');
+        const deliveryPrioritySection = document.getElementById('deliveryPrioritySection'); // Reference to delivery priority section
+        const deliveryPriorityRadios = document.querySelectorAll('input[name="deliveryPriority"]');
+        const paymentMethodRadios = document.querySelectorAll('input[name="paymentMethod"]');
+
+        // References to user account elements
+        const persistentCartContainer = document.getElementById('persistentCartItems');
+        const persistentCartItemCountSpan = document.getElementById('persistentCartItemCount');
+        const persistentCartActions = document.getElementById('persistentCartActions');
+        const orderHistoryItemsContainer = document.getElementById('orderHistoryItems');
+        const profileNameInput = document.getElementById('profileName');
+        const profilePhoneInput = document.getElementById('profilePhone');
+        const profileEmailInput = document.getElementById('profileEmail');
+        const profileAddressInput = document.getElementById('profileAddress');
+
+        // References to order progress elements
+        const currentOrderIdSpan = document.getElementById('currentOrderId');
+        const stepPreparation = document.getElementById('stepPreparation');
+        const stepOutForDelivery = document.getElementById('stepOutForDelivery');
+        const stepDelivered = document.getElementById('stepDelivered');
+        const orderStatusMessage = document.getElementById('orderStatusMessage');
+
+
+        // References to login screen elements
+        const loginScreen = document.getElementById('loginScreen');
+        const mainAppContent = document.getElementById('mainAppContent');
+        const loginContinueButton = document.getElementById('loginContinueButton');
+
+        // References to filtering and search elements
+        const categoryFilterButtons = document.querySelectorAll('.category-button'); // Updated selector
+        const searchInput = document.getElementById('restaurantSearchInput');
+        const searchButton = document.getElementById('searchButton');
+
+        // State variables for filtering, searching, and current restaurant data
+        let currentCategory = 'All';
+        let currentSearchTerm = '';
+        let currentRestaurantData = null; // Stores data for the currently open restaurant
+
+        // Simulated Cart: Stores items added from the current modal
+        let currentModalCart = {
+            bag: null, // Stores the selected surprise bag size object (only one allowed)
+            menuItems: [] // Stores an array of menu item objects
+        };
+
+        // State variable for the current modal view
+        let currentModalView = 'bagMenuDetail'; // Possible values: 'bagMenuDetail', 'cart', 'checkoutAddress', 'checkoutTime', 'checkoutPayment'
+
+        // --- Local Storage Functions ---
+        function saveCartToLocalStorage() {
+            localStorage.setItem('mystimealCart', JSON.stringify(currentModalCart));
+             renderPersistentCart(); // Update the persistent cart display
+        }
+
+        function loadCartFromLocalStorage() {
+            const savedCart = localStorage.getItem('mystimealCart');
+            if (savedCart) {
+                currentModalCart = JSON.parse(savedCart);
+                updateCartItemCount(); // Update modal cart count on load
+                 renderPersistentCart(); // Render the loaded cart in the persistent section
+            }
+        }
+
+        function saveOrderToHistory(order) {
+            orderHistory.push(order);
+            localStorage.setItem('mystimealOrderHistory', JSON.stringify(orderHistory));
+             renderOrderHistory(); // Update the order history display
+        }
+
+        function saveUserData() {
+             localStorage.setItem('mystimealUserData', JSON.stringify(userData));
+        }
+
+        // --- View Switching Functions ---
+        function showMainListing() {
+            mainListingView.classList.remove('hidden');
+            userAccountScreen.classList.add('hidden');
+            orderProgressView.classList.add('hidden');
+        }
+
+        function showUserAccount() {
+            mainListingView.classList.add('hidden');
+            userAccountScreen.classList.remove('hidden');
+            orderProgressView.classList.add('hidden');
+             renderOrderHistory(); // Render history when showing account
+             renderUserProfile(); // Render profile when showing account
+             renderPersistentCart(); // Render persistent cart when showing account
+        }
+
+        function showOrderProgress(orderId) {
+            mainListingView.classList.add('hidden');
+            userAccountScreen.classList.add('hidden');
+            orderProgressView.classList.remove('hidden');
+            currentOrderIdSpan.textContent = orderId;
+            // Simulate order progress steps (basic example)
+            updateOrderProgressSteps('placed');
+            // In a real app, you'd fetch the actual order status and update the steps
+        }
+
+        // --- Login Simulation ---
+        loginContinueButton.addEventListener('click', () => {
+            console.log("Login button clicked. Hiding login, showing main content."); // Debug log
+            loginScreen.classList.add('hidden'); // Hide login screen
+            mainAppContent.classList.remove('hidden'); // Show main app content
+            console.log("Calling filterAndRenderBags after login."); // Debug log
+            filterAndRenderBags(); // Render the initial list of bags after login
+            loadCartFromLocalStorage(); // Load persistent cart on login
+        });
+
+        // --- Filtering and Rendering ---
+        function filterAndRenderBags() {
+            console.log("filterAndRenderBags started."); // Debug log
+            console.log("mysteryBagsData:", mysteryBagsData); // Debug log: Check if data is loaded
+
+            let filteredBags = mysteryBagsData;
+
+            // Filter by category if a specific category is selected
+            if (currentCategory !== 'All') {
+                // If category is 'Restaurants', show all bags
+                if (currentCategory !== 'Restaurants') {
+                     filteredBags = filteredBags.filter(bag => bag.category === currentCategory);
+                }
+                 // If category is 'Restaurants', no additional filtering needed on category as all items are from restaurants
+            }
+
+            // Filter by search term if the search input is not empty
+            if (currentSearchTerm) {
+                const lowerSearchTerm = currentSearchTerm.toLowerCase();
+                filteredBags = filteredBags.filter(bag =>
+                    bag.bagName.toLowerCase().includes(lowerSearchTerm) ||
+                    bag.restaurantName.toLowerCase().includes(lowerSearchTerm)
+                );
+            }
+
+            console.log("Filtered bags:", filteredBags); // Debug log: Check filtered data
+
+            // Clear previous listings from the container
+            bagListingsContainer.innerHTML = '';
+
+            // Display a message if no bags are found after filtering/searching
+            if (filteredBags.length === 0) {
+                console.log("No filtered bags found. Displaying message."); // Debug log
+                bagListingsContainer.innerHTML = `<p class="col-span-full text-center text-gray-500">No surprise bags found matching your criteria.</p>`;
+                return;
+            }
+
+            // Render the filtered bags as cards
+            console.log("Rendering filtered bags..."); // Debug log
+            filteredBags.forEach(bag => {
+                console.log("Rendering bag:", bag); // Debug log: Log each bag being rendered
+                const card = `
+                    <div class="restaurant-card flex flex-col cursor-pointer" onclick="showBagDetails(${bag.id})">
+                        <img src="${bag.imageUrl}" alt="${bag.bagName}">
+                        <div class="card-content">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-1">${bag.restaurantName}</h3>
+                            <p class="restaurant-name text-sm text-gray-500 mb-2">${bag.bagName} - <span class="text-xs bg-orange-100 text-orange-600 font-medium px-2 py-0.5 rounded-full">${bag.category}</span></p>
+                             <p class="price text-2xl font-bold text-FF6B00 my-2">${bag.bagSizes.length > 1 ? `${bag.bagSizes[0].price} - ${bag.bagSizes[bag.bagSizes.length - 1].price}` : bag.bagSizes[0].price}</p>
+                            <p class="bag-info text-gray-500 text-xs mb-3 flex-grow">${bag.description ? bag.description.substring(0, 70) + '...' : 'No description available.'}</p>
+                            <button class="view-details-button font-semibold transition duration-150 text-sm">
+                                View Details
+                            </button>
+                        </div>
+                    </div>
+                `;
+                bagListingsContainer.innerHTML += card;
+            });
+             console.log("filterAndRenderBags finished."); // Debug log
+        }
+
+        // Add event listeners to category filter buttons to update filter and re-render
+        categoryFilterButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Remove 'active' class from all buttons and add to the clicked one
+                categoryFilterButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                // Update the current category and trigger filtering and rendering
+                currentCategory = button.dataset.category;
+                filterAndRenderBags();
+            });
+        });
+
+        // Add event listeners for the search button and input field
+        searchButton.addEventListener('click', () => {
+            currentSearchTerm = searchInput.value;
+            filterAndRenderBags();
+        });
+        searchInput.addEventListener('keyup', (event) => {
+            // Trigger search on Enter key press
+            if (event.key === 'Enter') {
+                currentSearchTerm = searchInput.value;
+                filterAndRenderBags();
+            }
+        });
+
+        // --- Modal and Cart Functions ---
+        // Function to show restaurant details in the modal
+        window.showBagDetails = function(bagId) {
+            const bag = mysteryBagsData.find(b => b.id === bagId);
+            if (bag) {
+                currentRestaurantData = bag; // Store the data for the currently open restaurant
+
+                // Reset the modal cart and set the initial view
+                currentModalCart = {
+                    bag: null,
+                    menuItems: []
+                };
+                switchModalView('bagMenuDetail'); // Start with the bag/menu view
+                updateModalButtons(); // Update buttons based on the initial empty cart state
+                updateCartItemCount(); // Update cart count display
+
+                // Populate modal with restaurant details
+                modalRestaurantTitle.textContent = bag.restaurantName;
+                modalRestaurantImage.src = bag.imageUrl;
+                modalRestaurantImage.alt = bag.restaurantName;
+
+                // Populate bag size options for the restaurant
+                modalBagSizesContainer.innerHTML = '';
+                if (bag.bagSizes && bag.bagSizes.length > 0) {
+                    bag.bagSizes.forEach(bagSize => {
+                        const bagSizeHtml = `
+                            <div class="flex justify-between items-center bag-size-item">
+                                <div>
+                                    <p class="font-semibold text-gray-800">${bag.bagName} (${bagSize.size})</p>
+                                    <p class="text-xs text-gray-600">${bagSize.description}</p>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <p class="text-lg font-bold text-FF6B00">${bagSize.price}</p>
+                                    <button class="add-to-cart-btn" onclick="addToCart({ type: 'bag', item: ${JSON.stringify(bagSize).replace(/"/g, '\'')} })">Add</button>
+                                </div>
+                            </div>
+                        `;
+                        modalBagSizesContainer.innerHTML += bagSizeHtml;
+                    });
+                } else {
+                     modalBagSizesContainer.innerHTML = `<p class="text-gray-500">No surprise bags available for this restaurant.</p>`;
+                }
+
+                // Populate available pickup times
+                modalPickupTimesContainer.innerHTML = '';
+                if (bag.availableTimes && bag.availableTimes.length > 0) {
+                     bag.availableTimes.forEach(time => {
+                         const timeChip = `<span class="bg-green-100 text-green-700 text-xs font-semibold px-2.5 py-1 rounded-full">${time.start} - ${time.end}</span>`;
+                         modalPickupTimesContainer.innerHTML += timeChip;
+                     });
+                } else {
+                     modalPickupTimesContainer.innerHTML = `<p class="text-gray-500">No specific pickup times listed.</p>`;
+                }
+
+                // Populate the full menu with "Add" buttons for each item
+                modalFullMenuContainer.innerHTML = '';
+                if (bag.fullMenu && bag.fullMenu.length > 0) {
+                    bag.fullMenu.forEach(item => {
+                        const menuItemHtml = `
+                            <div class="flex justify-between menu-item">
+                                <span>${item.name}</span>
+                                <div class="flex items-center gap-2">
+                                    <span>${item.price}</span>
+                                    <button class="add-to-cart-btn" onclick="addToCart({ type: 'menuItem', item: ${JSON.stringify(item).replace(/"/g, '\'')} })">Add</button>
+                                </div>
+                            </div>
+                        `; // Use single quotes for JSON string to avoid conflict with HTML attributes
+                        modalFullMenuContainer.innerHTML += menuItemHtml;
+                    });
+                } else {
+                    modalFullMenuContainer.innerHTML = `<p>Full menu details not available for this listing.</p>`;
+                }
+
+                // Show the modal with animation
+                modal.classList.remove('opacity-0', 'pointer-events-none');
+                modal.querySelector('.modal-content').classList.remove('scale-95');
+                modal.querySelector('.modal-content').classList.add('scale-100');
+            }
+        }
+
+        // Function to switch between the different views within the modal
+        function switchModalView(view) {
+            // Hide all modal views
+            bagMenuDetailView.classList.remove('active');
+            cartView.classList.remove('active');
+            checkoutAddressView.classList.remove('active');
+            checkoutTimeView.classList.remove('active');
+            checkoutPaymentView.classList.remove('active');
+
+            // Show the requested view and manage back button visibility
+            if (view === 'bagMenuDetail') {
+                bagMenuDetailView.classList.add('active');
+                modalBackButton.classList.add('hidden'); // No back button on the main detail view
+            } else if (view === 'cart') {
+                cartView.classList.add('active');
+                modalBackButton.classList.remove('hidden'); // Show back button
+                renderCartItems(); // Render cart items when navigating to the cart view
+                renderCartSuggestions(); // Render suggestions when navigating to the cart view
+            } else if (view === 'checkoutAddress') {
+                 checkoutAddressView.classList.add('active');
+                 modalBackButton.classList.remove('hidden');
+                 // Ensure delivery address fields visibility is correct based on initial radio state
+                 updateDeliveryAddressFieldsVisibility();
+            } else if (view === 'checkoutTime') {
+                 checkoutTimeView.classList.add('active');
+                 modalBackButton.classList.remove('hidden');
+                 populateTimeOptions(); // Populate time options based on delivery/pickup selection
+                 updateDeliveryPriorityVisibility(); // Update delivery priority visibility
+            } else if (view === 'checkoutPayment') {
+                 checkoutPaymentView.classList.add('active');
+                 modalBackButton.classList.remove('hidden');
+            }
+
+            currentModalView = view; // Update the state variable for the current view
+            updateModalButtons(); // Update action buttons based on the new view
+        }
+
+        // Function to add items (bag size or menu item) to the simulated cart
+        function addToCart(itemDetails) {
+            const itemType = itemDetails.type;
+            const item = itemDetails.item;
+
+            if (itemType === 'bag') {
+                // Allow only one surprise bag in the cart for simplicity
+                if (!currentModalCart.bag) {
+                    currentModalCart.bag = item;
+                    modalMessage.textContent = `${currentRestaurantData.bagName} (${item.size}) added to cart!`;
+                    modalMessage.className = 'text-center mt-4 text-sm text-green-600';
+                     // You could add logic here to disable or change the "Add" buttons for other bag sizes
+                } else {
+                     modalMessage.textContent = `Only one surprise bag allowed in the cart at a time.`;
+                     modalMessage.className = 'text-center mt-4 text-sm text-yellow-600';
+                }
+            } else if (itemType === 'menuItem') {
+                 // Check if the menu item is already in the cart (simple check by ID)
+                 const existingItem = currentModalCart.menuItems.find(i => i.id === item.id);
+                 if (!existingItem) {
+                    currentModalCart.menuItems.push(item);
+                    modalMessage.textContent = `${item.name} added to cart!`;
+                    modalMessage.className = 'text-center mt-4 text-sm text-green-600';
+                 } else {
+                    modalMessage.textContent = `${item.name} is already in the cart.`;
+                    modalMessage.className = 'text-center mt-4 text-sm text-yellow-600';
+                 }
+            }
+
+            updateModalButtons(); // Update the state of the action buttons
+            updateCartItemCount(); // Update the number shown on the "View Cart" button
+            saveCartToLocalStorage(); // Save cart state to local storage
+
+            // Clear the message after a short delay
+            setTimeout(() => {
+                modalMessage.textContent = '';
+                modalMessage.className = 'text-center mt-4 text-sm text-gray-500'; // Reset message styling
+            }, 2000);
+        }
+
+         // Function to remove an item from the simulated cart
+         function removeFromCart(itemType, itemId) {
+             if (itemType === 'bag') {
+                 currentModalCart.bag = null; // Remove the bag
+                 modalMessage.textContent = `Surprise bag removed from cart.`;
+             } else if (itemType === 'menuItem') {
+                 // Filter out the item with the matching ID
+                 currentModalCart.menuItems = currentModalCart.menuItems.filter(item => item.id !== itemId);
+                 modalMessage.textContent = `Item removed from cart.`;
+             }
+             modalMessage.className = 'text-center mt-4 text-sm text-green-600';
+             renderCartItems(); // Re-render the cart display
+             updateModalButtons(); // Update action buttons
+             updateCartItemCount(); // Update cart count
+             saveCartToLocalStorage(); // Save updated cart state
+
+             // Clear the message after a short delay
+             setTimeout(() => {
+                 modalMessage.textContent = '';
+                 modalMessage.className = 'text-center mt-4 text-sm text-gray-500'; // Reset message styling
+             }, 2000);
+         }
+
+        // Function to update the text, style, and visibility of modal action buttons based on current view and cart state
+        function updateModalButtons() {
+            const hasBag = currentModalCart.bag !== null;
+            const hasMenuItems = currentModalCart.menuItems.length > 0;
+            const totalItems = (hasBag ? 1 : 0) + currentModalCart.menuItems.length;
+
+            // Reset button classes and state to a default inactive style
+            modalActionButton.classList.remove('primary-button', 'secondary-button', 'warning-button');
+            modalActionButton.classList.add('bg-gray-200', 'hover:bg-gray-300', 'text-gray-800');
+            modalActionButton.disabled = false; // Enable by default, disable specifically below if needed
+
+            // Logic to set button text, style, and action based on the current modal view
+            if (currentModalView === 'bagMenuDetail') {
+                modalBackButton.classList.add('hidden'); // Hide back button on the main detail view
+                if (totalItems === 0) {
+                     modalActionButton.textContent = 'View Cart (0)';
+                     modalActionButton.disabled = true; // Disable if cart is empty
+                } else {
+                    modalActionButton.textContent = `View Cart (${totalItems})`;
+                    modalActionButton.classList.remove('bg-gray-200', 'hover:bg-gray-300', 'text-gray-800');
+                    modalActionButton.classList.add('primary-button'); // Use primary style when cart has items
+                    modalActionButton.disabled = false;
+                }
+                // The action button always navigates to the cart view from here
+                modalActionButton.onclick = () => switchModalView('cart');
+
+            } else if (currentModalView === 'cart') {
+                 modalBackButton.classList.remove('hidden'); // Show back button
+                 modalBackButton.onclick = () => switchModalView('bagMenuDetail'); // Back button goes to bag/menu view
+
+                 if (totalItems === 0) {
+                     modalActionButton.textContent = 'Cart Empty';
+                     modalActionButton.disabled = true; // Disable if cart is empty
+                 } else {
+                     modalActionButton.textContent = 'Proceed to Checkout';
+                     modalActionButton.classList.remove('bg-gray-200', 'hover:bg-gray-300', 'text-gray-800');
+                     modalActionButton.classList.add('primary-button');
+                     modalActionButton.disabled = false;
+                     // The action button proceeds to the address step of checkout
+                     modalActionButton.onclick = () => switchModalView('checkoutAddress');
+                 }
+
+            } else if (currentModalView === 'checkoutAddress') {
+                 modalBackButton.classList.remove('hidden');
+                 modalBackButton.onclick = () => switchModalView('cart'); // Back button goes to cart
+
+                 modalActionButton.textContent = 'Continue to Time';
+                 modalActionButton.classList.remove('bg-gray-200', 'hover:bg-gray-300', 'text-gray-800');
+                 modalActionButton.classList.add('primary-button');
+                 // The action button proceeds to the time step
+                 modalActionButton.onclick = () => switchModalView('checkoutTime');
+
+            } else if (currentModalView === 'checkoutTime') {
+                 modalBackButton.classList.remove('hidden');
+                 modalBackButton.onclick = () => switchModalView('checkoutAddress'); // Back button goes to address
+
+                 modalActionButton.textContent = 'Continue to Payment';
+                 modalActionButton.classList.remove('bg-gray-200', 'hover:bg-gray-300', 'text-gray-800');
+                 modalActionButton.classList.add('primary-button');
+                 // The action button proceeds to the payment step
+                 modalActionButton.onclick = () => switchModalView('checkoutPayment');
+
+            } else if (currentModalView === 'checkoutPayment') {
+                 modalBackButton.classList.remove('hidden');
+                 modalBackButton.onclick = () => switchModalView('checkoutTime'); // Back button goes to time
+
+                 modalActionButton.textContent = 'Place Final Order';
+                 modalActionButton.classList.remove('bg-gray-200', 'hover:bg-gray-300', 'text-gray-800');
+                 modalActionButton.classList.add('secondary-button'); // Use secondary style for the final action
+                 // The action button triggers the final order simulation
+                 modalActionButton.onclick = () => handleFinalOrder();
+            }
+        }
+
+        // Function to update the item count displayed on the "View Cart" button
+        function updateCartItemCount() {
+            const totalItems = (currentModalCart.bag ? 1 : 0) + currentModalCart.menuItems.length;
+            cartItemCountSpan.textContent = totalItems;
+        }
+
+        // Function to render the items currently in the simulated cart
+        function renderCartItems() {
+            cartItemsContainer.innerHTML = ''; // Clear previous cart items
+            let total = 0;
+
+            // Render the surprise bag if present
+            if (currentModalCart.bag) {
+                const bag = currentModalCart.bag;
+                const bagPrice = parseFloat(bag.price.replace('₹', '')); // Parse price string to number
+                total += bagPrice;
+                const bagItemHtml = `
+                    <div class="flex justify-between items-center border-b pb-2">
+                        <div>
+                            <p class="font-semibold text-gray-800">${currentRestaurantData.bagName} (${bag.size})</p>
+                            <p class="text-xs text-gray-600">${bag.type}</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <p class="text-base font-bold text-FF6B00">${bag.price}</p>
+                            <button class="remove-item-btn" onclick="removeFromCart('bag', '${bag.id}')">Remove</button>
+                        </div>
+                    </div>
+                `;
+                cartItemsContainer.innerHTML += bagItemHtml;
+            }
+
+            // Render the menu items if any are present
+            if (currentModalCart.menuItems.length > 0) {
+                 currentModalCart.menuItems.forEach(item => {
+                     const itemPrice = parseFloat(item.price.replace('₹', '')); // Parse price string to number
+                     total += itemPrice;
+                     const menuItemHtml = `
+                         <div class="flex justify-between items-center border-b pb-2">
+                             <p class="text-gray-700">${item.name}</p>
+                             <div class="flex items-center gap-2">
+                                 <p class="text-base text-gray-600">${item.price}</p>
+                                 <button class="remove-item-btn" onclick="removeFromCart('menuItem', '${item.id}')">Remove</button>
+                             </div>
+                         </div>
+                     `;
+                     cartItemsContainer.innerHTML += menuItemHtml;
+                 });
+            }
+
+            // Display a message if the cart is empty
+            if (!currentModalCart.bag && currentModalCart.menuItems.length === 0) {
+                cartItemsContainer.innerHTML = `<p class="text-center text-gray-500">Your cart is empty.</p>`;
+            }
+
+            // Update the displayed total price
+            cartTotalSpan.textContent = `Total: ₹${total.toFixed(2)}`; // Display total with 2 decimal places
+        }
+
+        // Function to render suggested items in the cart view
+        function renderCartSuggestions() {
+            cartSuggestionsContainer.innerHTML = ''; // Clear previous suggestions
+            // Only show suggestions if the cart is not empty
+            if (currentModalCart.bag || currentModalCart.menuItems.length > 0) {
+                 const suggestionsTitle = document.createElement('h4');
+                 suggestionsTitle.textContent = 'You might also like:';
+                 cartSuggestionsContainer.appendChild(suggestionsTitle);
+
+                 cartSuggestionsData.forEach(suggestion => {
+                     const suggestionHtml = `
+                         <div class="suggestion-item">
+                             <div class="item-details">
+                                 <img src="${suggestion.imageUrl}" alt="${suggestion.name}">
+                                 <div class="item-info">
+                                     <span>${suggestion.name}</span>
+                                     <span class="price">${suggestion.price}</span>
+                                 </div>
+                             </div>
+                             <button class="add-button" onclick="addToCart({ type: 'menuItem', item: ${JSON.stringify(suggestion).replace(/"/g, '\'')} })">Add</button>
+                         </div>
+                     `;
+                     cartSuggestionsContainer.innerHTML += suggestionHtml;
+                 });
+            }
+        }
+
+
+        // Function to populate the pickup time options in the checkout time view
+        function populateTimeOptions() {
+            pickupTimeSelect.innerHTML = ''; // Clear previous options
+            const selectedDeliveryOption = document.querySelector('input[name="deliveryOption"]:checked').value;
+
+            if (selectedDeliveryOption === 'pickup') {
+                 if (currentRestaurantData && currentRestaurantData.availableTimes.length > 0) {
+                     currentRestaurantData.availableTimes.forEach(time => {
+                         const option = document.createElement('option');
+                         option.value = `${time.start}-${time.end}`;
+                         option.textContent = `${time.start} - ${time.end} (Surprise Bag Pickup)`;
+                         pickupTimeSelect.appendChild(option);
+                     });
+                 } else {
+                     const option = document.createElement('option');
+                     option.value = 'any';
+                     option.textContent = 'Any available pickup time';
+                     pickupTimeSelect.appendChild(option);
+                 }
+            } else if (selectedDeliveryOption === 'delivery') {
+                 // Simulate delivery time windows (can be more sophisticated)
+                 const deliveryTimes = [
+                     "Within 30-45 minutes",
+                     "Within 1 hour",
+                     "Within 1-1.5 hours"
+                 ];
+                 deliveryTimes.forEach(time => {
+                     const option = document.createElement('option');
+                     option.value = time;
+                     option.textContent = time;
+                     pickupTimeSelect.appendChild(option);
+                 });
+            }
+        }
+
+        // Function to handle the final order placement (simulated checkout process)
+        function handleFinalOrder() {
+            const hasBag = currentModalCart.bag !== null;
+            const hasMenuItems = currentModalCart.menuItems.length > 0;
+
+            // Prevent placing an order if the cart is empty
+            if (!hasBag && !hasMenuItems) {
+                 modalMessage.textContent = 'Your cart is empty. Cannot place order.';
+                 modalMessage.className = 'text-center mt-4 text-sm text-yellow-600';
+                 return;
+            }
+
+            // Simulate collecting checkout details from form inputs
+            const selectedDeliveryOption = document.querySelector('input[name="deliveryOption"]:checked').value;
+            const address = addressInput.value.trim();
+            const dropoff = dropoffTextarea.value.trim();
+            const timeZone = timeZoneSelect.value;
+            const preferredTime = pickupTimeSelect.value;
+            const selectedDeliveryPriority = document.querySelector('input[name="deliveryPriority"]:checked')?.value;
+            const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value;
+
+            // Basic validation: Address is required for delivery
+            if (selectedDeliveryOption === 'delivery' && !address) {
+                 modalMessage.textContent = 'Please enter a delivery address for delivery orders.';
+                 modalMessage.className = 'text-center mt-4 text-sm text-yellow-600';
+                 return;
+            }
+             // Basic validation: Payment method is required
+             if (!paymentMethod) {
+                 modalMessage.textContent = 'Please select a payment method.';
+                 modalMessage.className = 'text-center mt-4 text-sm text-yellow-600';
+                 return;
+             }
+
+            // Construct a simulated order object
+            const newOrder = {
+                id: orderHistory.length + 1, // Simple incremental ID
+                restaurant: currentRestaurantData.restaurantName,
+                items: {
+                    bag: currentModalCart.bag,
+                    menuItems: currentModalCart.menuItems
+                },
+                deliveryOption: selectedDeliveryOption,
+                address: selectedDeliveryOption === 'delivery' ? address : 'N/A',
+                dropoff: selectedDeliveryOption === 'delivery' ? dropoff : 'N/A',
+                timeZone: timeZone,
+                preferredTime: preferredTime,
+                deliveryPriority: selectedDeliveryOption === 'delivery' ? selectedDeliveryPriority : 'N/A',
+                paymentMethod: paymentMethod,
+                total: cartTotalSpan.textContent.replace('Total: ₹', ''), // Capture the total price
+                date: new Date().toLocaleDateString(), // Add current date
+                status: 'placed' // Initial status
+            };
+
+            saveOrderToHistory(newOrder); // Save the new order to history
+
+            // Simulate clearing the current modal cart and closing the modal
+            currentModalCart = { bag: null, menuItems: [] };
+            updateCartItemCount();
+            saveCartToLocalStorage(); // Clear persistent cart
+
+            // Reset checkout form fields
+            addressInput.value = '';
+            dropoffTextarea.value = '';
+            document.getElementById('optionPickup').checked = true;
+            document.getElementById('priorityRegular').checked = true;
+            updateDeliveryAddressFieldsVisibility();
+            updateDeliveryPriorityVisibility();
+            pickupTimeSelect.innerHTML = '';
+            document.querySelectorAll('input[name="paymentMethod"]').forEach(radio => radio.checked = false);
+
+            // Show the order progress view for the new order
+            closeModal(); // Close the checkout modal
+            showOrderProgress(newOrder.id); // Show the order progress view
+
+             // Simulate order status updates over time (basic example)
+             setTimeout(() => { updateOrderProgressSteps('preparing'); }, 3000); // After 3 seconds
+             setTimeout(() => { updateOrderProgressSteps('out'); }, 8000); // After 8 seconds
+             setTimeout(() => { updateOrderProgressSteps('delivered'); }, 15000); // After 15 seconds
+
+        }
+
+        // Function to close the modal and reset its state
+        function closeModal() {
+            // Hide the modal with animation
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            modal.querySelector('.modal-content').classList.add('scale-95');
+            modal.querySelector('.modal-content').classList.remove('scale-100');
+            // Clear any message displayed in the modal
+             modalMessage.textContent = '';
+             modalMessage.className = 'text-center mt-4 text-sm text-gray-500'; // Reset message styling
+             // Reset modal cart and view state (Note: Persistent cart is handled separately)
+             // currentModalCart = { bag: null, menuItems: [] }; // Don't clear modal cart here, it's handled on order placement or modal open
+             currentModalView = 'bagMenuDetail'; // Reset to the initial bag/menu view
+             updateModalButtons(); // Update buttons based on the reset state
+             // updateCartItemCount(); // Don't reset cart count here, it reflects the persistent cart now
+             currentRestaurantData = null; // Clear the stored restaurant data
+
+             // Reset checkout form fields
+             addressInput.value = '';
+             dropoffTextarea.value = '';
+             document.getElementById('optionPickup').checked = true;
+             document.getElementById('priorityRegular').checked = true;
+             updateDeliveryAddressFieldsVisibility();
+             updateDeliveryPriorityVisibility();
+             pickupTimeSelect.innerHTML = '';
+             document.querySelectorAll('input[name="paymentMethod"]').forEach(radio => radio.checked = false);
+        }
+
+        // Add event listeners to close the modal
+        closeModalButton.addEventListener('click', closeModal);
+        // Close modal if clicking outside the modal content area
+        modal.addEventListener('click', (event) => {
+            if (event.target === modal) {
+                closeModal();
+            }
+        });
+        // Close modal if the Escape key is pressed
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && !modal.classList.contains('pointer-events-none')) {
+                closeModal();
+            }
+        });
+
+        // Add event listener for the Back button in the modal
+        modalBackButton.addEventListener('click', () => {
+            // Navigate back to the previous view based on the current view
+            if (currentModalView === 'cart') {
+                switchModalView('bagMenuDetail');
+            } else if (currentModalView === 'checkoutAddress') {
+                switchModalView('cart');
+            } else if (currentModalView === 'checkoutTime') {
+                switchModalView('checkoutAddress');
+            } else if (currentModalView === 'checkoutPayment') {
+                switchModalView('checkoutTime');
+            }
+        });
+
+        // Function to toggle visibility of delivery address fields based on delivery option
+        function updateDeliveryAddressFieldsVisibility() {
+            const selectedDeliveryOption = document.querySelector('input[name="deliveryOption"]:checked').value;
+            if (selectedDeliveryOption === 'delivery') {
+                deliveryAddressFields.classList.remove('hidden');
+            } else {
+                deliveryAddressFields.classList.add('hidden');
+            }
+        }
+
+        // Function to toggle visibility of delivery priority section based on delivery option
+        function updateDeliveryPriorityVisibility() {
+             const selectedDeliveryOption = document.querySelector('input[name="deliveryOption"]:checked').value;
+             if (selectedDeliveryOption === 'delivery') {
+                 deliveryPrioritySection.classList.remove('hidden');
+             } else {
+                 deliveryPrioritySection.classList.add('hidden');
+             }
+        }
+
+
+        // Add event listeners to the delivery option radio buttons
+        deliveryOptionRadios.forEach(radio => {
+            radio.addEventListener('change', () => {
+                updateDeliveryAddressFieldsVisibility();
+                updateDeliveryPriorityVisibility();
+                populateTimeOptions(); // Repopulate time options based on selection
+            });
+        });
+
+        // --- User Account Functions ---
+        function renderPersistentCart() {
+            persistentCartContainer.innerHTML = ''; // Clear previous items
+            const hasBag = currentModalCart.bag !== null;
+            const hasMenuItems = currentModalCart.menuItems.length > 0;
+            const totalItems = (hasBag ? 1 : 0) + currentModalCart.menuItems.length;
+
+            persistentCartItemCountSpan.textContent = totalItems;
+
+            if (totalItems === 0) {
+                persistentCartContainer.innerHTML = `<p class="text-center text-gray-500">Your persistent cart is empty.</p>`;
+                persistentCartActions.classList.add('hidden');
+            } else {
+                 persistentCartActions.classList.remove('hidden');
+                 if (hasBag) {
+                     const bag = currentModalCart.bag;
+                      const bagItemHtml = `
+                         <div class="persistent-cart-item">
+                             <div class="item-details">
+                                 <img src="${currentRestaurantData ? currentRestaurantData.imageUrl : 'https://placehold.co/50x50/eee/333?text=Bag'}" alt="${bag.bagName}">
+                                 <div class="item-info">
+                                     <span>${bag.bagName} (${bag.size})</span>
+                                     <span class="price">${bag.price}</span>
+                                 </div>
+                             </div>
+                         </div>
+                     `;
+                     persistentCartContainer.innerHTML += bagItemHtml;
+                 }
+                 if (hasMenuItems) {
+                     currentModalCart.menuItems.forEach(item => {
+                          const menuItemHtml = `
+                             <div class="persistent-cart-item">
+                                 <div class="item-details">
+                                     <img src="https://placehold.co/50x50/eee/333?text=Item" alt="${item.name}">
+                                     <div class="item-info">
+                                         <span>${item.name}</span>
+                                         <span class="price">${item.price}</span>
+                                     </div>
+                                 </div>
+                             </div>
+                         `;
+                         persistentCartContainer.innerHTML += menuItemHtml;
+                     });
+                 }
+            }
+        }
+
+        function continueWithPersistentCart() {
+            // This function would typically navigate back to the restaurant's detail page
+            // with the cart pre-populated. For this simulation, we'll just close the account view
+            // and the items are already in currentModalCart due to loadCartFromLocalStorage.
+            showMainListing();
+             closeModal(); // Close the modal if it was open
+             // You might want to automatically open the modal to the cart view here
+             // if the user was in the middle of checkout before leaving.
+        }
+
+        function clearPersistentCart() {
+            currentModalCart = { bag: null, menuItems: [] };
+            saveCartToLocalStorage(); // Clear from local storage
+            renderPersistentCart(); // Update display
+            updateCartItemCount(); // Reset modal cart count
+             modalMessage.textContent = 'Persistent cart cleared.';
+             modalMessage.className = 'text-center mt-4 text-sm text-green-600';
+             setTimeout(() => { modalMessage.textContent = ''; modalMessage.className = 'text-center mt-4 text-sm text-gray-500'; }, 2000);
+        }
+
+        function renderOrderHistory() {
+            orderHistoryItemsContainer.innerHTML = ''; // Clear previous history
+            if (orderHistory.length === 0) {
+                 orderHistoryItemsContainer.innerHTML = `<p class="text-center text-gray-500">No past orders found.</p>`;
+            } else {
+                orderHistory.forEach(order => {
+                    let itemSummary = '';
+                    if (order.items.bag) {
+                        itemSummary += `${order.items.bag.bagName} (${order.items.bag.size})`;
+                    }
+                    if (order.items.menuItems.length > 0) {
+                        if (itemSummary) itemSummary += ', ';
+                        itemSummary += order.items.menuItems.map(item => item.name).join(', ');
+                    }
+
+                    const orderHtml = `
+                        <div class="order-item">
+                            <div class="order-header">
+                                <span class="restaurant-name">${order.restaurant}</span>
+                                <span class="order-date">${order.date}</span>
+                            </div>
+                             <div class="order-details">
+                                 Items: ${itemSummary || 'N/A'}
+                             </div>
+                             <div class="flex justify-between items-center">
+                                 <span class="order-total">Total: ₹${order.total}</span>
+                                 <span class="order-status ${order.status}">${order.status.charAt(0).toUpperCase() + order.status.slice(1)}</span>
+                             </div>
+                        </div>
+                    `;
+                    orderHistoryItemsContainer.innerHTML += orderHtml;
+                });
+            }
+        }
+
+        function renderUserProfile() {
+            profileNameInput.value = userData.name;
+            profilePhoneInput.value = userData.phone;
+            profileEmailInput.value = userData.email;
+            profileAddressInput.value = userData.address;
+        }
+
+        function saveProfile() {
+            userData.name = profileNameInput.value;
+            userData.phone = profilePhoneInput.value;
+            userData.email = profileEmailInput.value;
+            userData.address = profileAddressInput.value;
+            saveUserData(); // Save updated user data
+            modalMessage.textContent = 'Profile saved successfully!';
+            modalMessage.className = 'text-center mt-4 text-sm text-green-600';
+            setTimeout(() => { modalMessage.textContent = ''; modalMessage.className = 'text-center mt-4 text-sm text-gray-500'; }, 2000);
+        }
+
+        // --- Order Progress Functions ---
+        function updateOrderProgressSteps(status) {
+            // Reset all steps to not completed
+            stepPreparation.classList.remove('completed');
+            stepOutForDelivery.classList.remove('completed');
+            stepDelivered.classList.remove('completed');
+            orderStatusMessage.textContent = '';
+
+            if (status === 'placed') {
+                 orderStatusMessage.textContent = 'Order has been placed.';
+            } else if (status === 'preparing') {
+                stepPreparation.classList.add('completed');
+                orderStatusMessage.textContent = 'The restaurant is preparing your order.';
+            } else if (status === 'out') {
+                stepPreparation.classList.add('completed');
+                stepOutForDelivery.classList.add('completed');
+                 orderStatusMessage.textContent = 'Your order is out for delivery/ready for pickup.';
+            } else if (status === 'delivered') {
+                stepPreparation.classList.add('completed');
+                stepOutForDelivery.classList.add('completed');
+                stepDelivered.classList.add('completed');
+                 orderStatusMessage.textContent = 'Order delivered/picked up!';
+            }
+            // In a real app, you'd also update the status text within each step
+        }
+
+
+        // --- Initial Load ---
+        // Note: Initial rendering of bags on the main screen happens after the login button is clicked.
+        // Load persistent cart data when the page loads (before login)
+        loadCartFromLocalStorage();
+
+    </script>
+</body>
+</html>
