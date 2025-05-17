@@ -902,13 +902,14 @@
              <div id="otpView" class="auth-view">
                  <h2 class="text-2xl font-bold text-gray-800 mb-6">Verify Phone Number</h2>
                  <p class="text-center text-gray-600 mb-6">Enter the 4-digit OTP sent to <span id="otpPhoneNumber"></span></p>
-                 <div class="flex justify-center space-x-2 mb-8">
+                 <div class="flex justify-center space-x-2 mb-4">
                      <input type="text" class="otp-input" maxlength="1" id="otp1">
                      <input type="text" class="otp-input" maxlength="1" id="otp2">
                      <input type="text" class="otp-input" maxlength="1" id="otp3">
                      <input type="text" class="otp-input" maxlength="1" id="otp4">
                  </div>
-                 <button id="verifyOtpButton" class="w-full primary-button font-semibold py-3 px-6 rounded-lg shadow-md transition duration-150">
+                 <p id="tempOtpDisplay" class="text-center mt-2 text-sm font-semibold text-blue-600 hidden"></p>
+                 <button id="verifyOtpButton" class="w-full primary-button font-semibold py-3 px-6 rounded-lg shadow-md transition duration-150 mt-4">
                      Verify OTP
                  </button>
                   <p class="text-center text-sm text-gray-500 mt-4">
@@ -1443,6 +1444,7 @@
         const verifyOtpButton = document.getElementById('verifyOtpButton'); // Reference to verify OTP button
         const resendOtpButton = document.getElementById('resendOtpButton'); // Reference to resend OTP button
         const authMessage = document.getElementById('authMessage'); // Reference to auth message paragraph
+        const tempOtpDisplay = document.getElementById('tempOtpDisplay'); // Reference to the temporary OTP display element
 
 
         const mainAppContent = document.getElementById('mainAppContent'); // Reference to the main app content container
@@ -1576,6 +1578,7 @@
             signupView.classList.remove('active');
             otpView.classList.remove('active');
              authMessage.textContent = ''; // Clear any previous auth messages
+             tempOtpDisplay.classList.add('hidden'); // Hide temp OTP on view switch
         }
 
         function showSignupView() {
@@ -1583,6 +1586,7 @@
             signupView.classList.add('active');
             otpView.classList.remove('active');
              authMessage.textContent = ''; // Clear any previous auth messages
+             tempOtpDisplay.classList.add('hidden'); // Hide temp OTP on view switch
         }
 
          function showOtpView(phone) {
@@ -1592,6 +1596,7 @@
              otpPhoneNumberSpan.textContent = '+91 ' + phone; // Display the phone number
              authMessage.textContent = ''; // Clear any previous auth messages
              clearOtpInputs(); // Clear previous OTP inputs
+             // tempOtpDisplay.classList.remove('hidden'); // Show temp OTP display when OTP view is active (handled in simulateSendOtp now)
          }
 
 
@@ -1803,6 +1808,9 @@
                  authMessage.textContent = 'OTP verified successfully!';
                  authMessage.className = 'text-center mt-4 text-sm text-green-600';
 
+                 // Hide the temporary OTP display on successful verification
+                 tempOtpDisplay.classList.add('hidden');
+
                  // If there's temporary new user data, save it as the current user
                  const tempNewUser = sessionStorage.getItem('tempNewUser');
                  if (tempNewUser) {
@@ -1824,6 +1832,7 @@
                  authMessage.textContent = 'Invalid OTP. Please try again.';
                  authMessage.className = 'text-center mt-4 text-sm text-yellow-600';
                  clearOtpInputs(); // Clear OTP inputs on failure
+                  // Keep the temporary OTP displayed for retry
                  setTimeout(() => { authMessage.textContent = ''; authMessage.className = 'text-center mt-4 text-sm text-gray-500'; }, 3000);
              }
          });
@@ -1849,16 +1858,23 @@
              // Generate a random 4-digit OTP
              simulatedOtp = Math.floor(1000 + Math.random() * 9000).toString();
              console.log(`Simulated OTP for +91 ${phone}: ${simulatedOtp}`); // Log OTP to console for testing
-             authMessage.textContent = `OTP sent to +91 ${phone}. Check console for simulated OTP.`;
+
+             // Display the simulated OTP on the screen
+             tempOtpDisplay.textContent = `Temporary OTP: ${simulatedOtp} (Simulated)`;
+             tempOtpDisplay.classList.remove('hidden'); // Show the display element
+
+             authMessage.textContent = `OTP sent to +91 ${phone}.`; // Update message to remove console instruction
              authMessage.className = 'text-center mt-4 text-sm text-green-600';
          }
 
-         // Clear OTP input fields
+         // Clear OTP input fields and hide the temporary OTP display
          function clearOtpInputs() {
              otpInputs.forEach(input => input.value = '');
              if (otpInputs.length > 0) {
                  otpInputs[0].focus(); // Focus on the first input
              }
+             // Keep the temporary OTP displayed when inputs are cleared (e.g., on failed verification)
+             // tempOtpDisplay.classList.add('hidden'); // Hide temporary OTP display
          }
 
          // Auto-focus and move to the next OTP input
@@ -1893,7 +1909,7 @@
             if (currentCategory !== 'All') {
                 // If category is 'Restaurants', show all bags
                 if (currentCategory !== 'Restaurants') {
-                     filteredBags = filteredBags.filter(bag => bag.category === currentCategory);
+                     filteredBags = filteredBgs.filter(bag => bag.category === currentCategory);
                 }
                  // If category is 'Restaurants', no additional filtering needed on category as all items are from restaurants
             }
