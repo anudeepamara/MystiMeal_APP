@@ -824,6 +824,28 @@
                .receipt-details strong {
                    color: #1f2937;
                }
+             .receipt-item-details {
+                 display: flex;
+                 align-items: center;
+                 gap: 10px;
+                 margin-bottom: 5px; /* Reduced margin for items */
+             }
+              .receipt-item-details img {
+                  width: 40px; /* Smaller image in receipt */
+                  height: 40px;
+                  object-fit: cover;
+                  border-radius: 4px;
+              }
+               .receipt-item-details .item-info span {
+                   display: block;
+                   font-size: 0.9rem;
+                   color: #333;
+               }
+                .receipt-item-details .item-info .price {
+                    font-size: 0.8rem;
+                    color: #6b7280;
+                }
+
 
     </style>
 </head>
@@ -831,7 +853,7 @@
 
     <div id="authScreen" class="fixed inset-0 z-50 flex flex-col items-center justify-center p-4">
         <div class="auth-card text-center w-full max-w-sm">
-            <img src="https://placehold.co/100x100/0da487/ffffff?text=MystiMeal&font=Roboto" alt="MystiMeal Logo" class="mx-auto mb-6 rounded-full">
+            <img src="assets/logo.jpeg" alt="MystiMeal Logo" class="mx-auto mb-6 rounded-full">
             <h1 class="text-4xl font-bold text-gray-800 mb-3">MystiMeal</h1>
             <p class="text-gray-600 mb-8">Save food. Save money. Stay curious.</p>
 
@@ -1258,7 +1280,7 @@
                 location: "Hyderabad",
                 category: "Biryani", // Specific category
                 // You can replace this with an actual image URL for Pista House Biryani
-                imageUrl: "https://placehold.co/600x400/FF8C00/FFF7ED?text=Pista+House%0ABiryani&font=Roboto",
+                imageUrl:"https://img.cdn4dd.com/cdn-cgi/image/fit=contain,width=1200,height=672,format=auto/https://doordash-static.s3.amazonaws.com/media/restaurant/cover_square/Pista_House_lo.jpg",
                 bagSizes: [
                      { id: 'bag-1-small', size: 'Small', type: 'Small Surprise Biryani Bag', description: 'A smaller portion of surplus biryani.', price: '₹99' },
                      { id: 'bag-1-medium', size: 'Medium', type: 'Medium Surprise Biryani Bag', description: 'A good portion of surplus biryani.', price: '₹149' },
@@ -1266,10 +1288,11 @@
                 ],
                 availableTimes: [{start: "1:00 PM", end: "3:00 PM"}, {start: "8:00 PM", end: "10:00 PM"}],
                 fullMenu: [
-                    {id: 'menu-item-1-1', name: "Chicken Dum Biryani", price: "₹280"},
-                    {id: 'menu-item-1-2', name: "Mutton Dum Biryani", price: "₹350"},
-                    {id: 'menu-item-1-3', name: "Veg Biryani", price: "₹220"},
-                    {id: 'menu-item-1-4', name: "Double Ka Meetha", price: "₹120"}
+                    // Added imageUrl for menu items (using placeholders)
+                    {id: 'menu-item-1-1', name: "Chicken Dum Biryani", price: "₹280", imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQoIycguxFgTpIN3L00tYQhJ2WkypXj5w_QkQ&s"},
+                    {id: 'menu-item-1-2', name: "Mutton Dum Biryani", price: "₹350", imageUrl: "https://placehold.co/80x80/A0522D/FFF7ED?text=Mutton%0ABiryani&font=Roboto"},
+                    {id: 'menu-item-1-3', name: "Veg Biryani", price: "₹220", imageUrl: "https://placehold.co/80x80/32CD32/FFF7ED?text=Veg%0ABiryani&font=Roboto"},
+                    {id: 'menu-item-1-4', name: "Double Ka Meetha", price: "₹120", imageUrl: "https://placehold.co/80x80/FFB6C1/333?text=Double%0AKa%0AMeetha&font=Roboto"}
                 ]
             },
             {
@@ -1285,9 +1308,10 @@
                  ],
                 availableTimes: [{start: "9:00 AM", end: "11:00 AM"}],
                 fullMenu: [
-                    {id: 'menu-item-2-1', name: "English Breakfast", price: "₹300"},
-                    {id: 'menu-item-2-2', name: "Pancakes", price: "₹200"},
-                    {id: 'menu-item-2-3', name: "Coffee", price: "₹150"}
+                    // Added imageUrl for menu items (using placeholders)
+                    {id: 'menu-item-2-1', name: "English Breakfast", price: "₹300", imageUrl: "https://placehold.co/80x80/4682B4/FFF7ED?text=English%0ABreakfast&font=Roboto"},
+                    {id: 'menu-item-2-2', name: "Pancakes", price: "₹200", imageUrl: "https://placehold.co/80x80/FFC0CB/333?text=Pancakes&font=Roboto"},
+                    {id: 'menu-item-2-3', name: "Coffee", price: "₹150", imageUrl: "https://placehold.co/80x80/4682B4/FFF7ED?text=Coffee&font=Roboto"}
                 ]
             },
             {
@@ -1303,9 +1327,10 @@
                  ],
                 availableTimes: [{start: "4:00 PM", end: "6:00 PM"}, {start: "8:00 PM", end: "9:00 PM"}],
                 fullMenu: [
-                    {id: 'menu-item-3-1', name: "Chocolate Croissant", price: "₹100"},
-                    {id: 'menu-item-3-2', name: "Red Velvet Pastry", price: "₹150"},
-                    {id: 'menu-item-3-3', name: "Assorted Cookies (Box)", price: "₹250"}
+                    // Added imageUrl for menu items (using placeholders)
+                    {id: 'menu-item-3-1', name: "Chocolate Croissant", price: "₹100", imageUrl: "https://placehold.co/80x80/A0522D/FFF7ED?text=Croissant&font=Roboto"},
+                    {id: 'menu-item-3-2', name: "Red Velvet Pastry", price: "₹150", imageUrl: "https://placehold.co/80x80/FFC0CB/333?text=Red%0AVelvet&font=Roboto"},
+                    {id: 'menu-item-3-3', name: "Assorted Cookies (Box)", price: "₹250", imageUrl: "https://placehold.co/80x80/FFB6C1/333?text=Cookies&font=Roboto"}
                 ]
             },
             {
@@ -1321,9 +1346,10 @@
                  ],
                 availableTimes: [{start: "3:00 PM", end: "5:00 PM"}],
                 fullMenu: [
-                    {id: 'menu-item-4-1', name: "Veg Sandwich", price: "₹80"},
-                    {id: 'menu-item-4-2', name: "French Fries", price: "₹100"},
-                    {id: 'menu-item-4-3', name: "Milkshake", price: "₹120"}
+                    // Added imageUrl for menu items (using placeholders)
+                    {id: 'menu-item-4-1', name: "Veg Sandwich", price: "₹80", imageUrl: "https://placehold.co/80x80/32CD32/FFF7ED?text=Sandwich&font=Roboto"},
+                    {id: 'menu-item-4-2', name: "French Fries", price: "₹100", imageUrl: "https://placehold.co/80x80/FF8C00/FFF7ED?text=Fries&font=Roboto"},
+                    {id: 'menu-item-4-3', name: "Milkshake", price: "₹120", imageUrl: "https://placehold.co/80x80/4682B4/FFF7ED?text=Milkshake&font=Roboto"}
                 ]
             },
             {
@@ -1339,9 +1365,10 @@
                  ],
                 availableTimes: [{start: "12:00 PM", end: "2:00 PM"}, {start: "7:00 PM", end: "9:00 PM"}],
                 fullMenu: [
-                    {id: 'menu-item-5-1', name: "Margherita Pizza", price: "₹250"},
-                    {id: 'menu-item-5-2', name: "Farmhouse Pizza", price: "₹350"},
-                    {id: 'menu-item-5-3', name: "Garlic Bread", price: "₹130"}
+                    // Added imageUrl for menu items (using placeholders)
+                    {id: 'menu-item-5-1', name: "Margherita Pizza", price: "₹250", imageUrl: "https://placehold.co/80x80/FF4500/FFF7ED?text=Margherita&font=Roboto"},
+                    {id: 'menu-item-5-2', name: "Farmhouse Pizza", price: "₹350", imageUrl: "https://placehold.co/80x80/32CD32/FFF7ED?text=Farmhouse&font=Roboto"},
+                    {id: 'menu-item-5-3', name: "Garlic Bread", price: "₹130", imageUrl: "https://placehold.co/80x80/FF4500/FFF7ED?text=Garlic%0ABread&font=Roboto"}
                 ]
             },
              {
@@ -1358,9 +1385,10 @@
                  ],
                 availableTimes: [{start: "6:00 PM", end: "8:00 PM"}],
                 fullMenu: [
-                    {id: 'menu-item-6-1', name: "Gulab Jamun (4 pcs)", price: "₹100"},
-                    {id: 'menu-item-6-2', name: "Rasgulla (4 pcs)", price: "₹100"},
-                    {id: 'menu-item-6-3', name: "Assorted Barfi (250g)", price: "₹200"}
+                    // Added imageUrl for menu items (using placeholders)
+                    {id: 'menu-item-6-1', name: "Gulab Jamun (4 pcs)", price: "₹100", imageUrl: "https://placehold.co/80x80/FFB6C1/333?text=Gulab%0AJamun&font=Roboto"},
+                    {id: 'menu-item-6-2', name: "Rasgulla (4 pcs)", price: "₹100", imageUrl: "https://placehold.co/80x80/FFC0CB/333?text=Rasgulla&font=Roboto"},
+                    {id: 'menu-item-6-3', name: "Assorted Barfi (250g)", price: "₹200", imageUrl: "https://placehold.co/80x80/FFB6C1/333?text=Barfi&font=Roboto"}
                 ]
             },
              {
@@ -1376,10 +1404,11 @@
                  ],
                 availableTimes: [{start: "7:30 PM", end: "9:30 PM"}],
                 fullMenu: [
-                    {id: 'menu-item-7-1', name: "Butter Chicken", price: "₹300"},
-                    {id: 'menu-item-7-2', name: "Dal Makhani", price: "₹250"},
-                    {id: 'menu-item-7-3', name: "Naan", price: "₹50"},
-                    {id: 'menu-item-7-4', name: "Jeera Rice", price: "₹150"}
+                    // Added imageUrl for menu items (using placeholders)
+                    {id: 'menu-item-7-1', name: "Butter Chicken", price: "₹300", imageUrl: "https://placehold.co/80x80/A0522D/FFF7ED?text=Butter%0AChicken&font=Roboto"},
+                    {id: 'menu-item-7-2', name: "Dal Makhani", price: "₹250", imageUrl: "https://placehold.co/80x80/333/FFF7ED?text=Dal%0AMakhani&font=Roboto"},
+                    {id: 'menu-item-7-3', name: "Naan", price: "₹50", imageUrl: "https://placehold.co/80x80/FF8C00/FFF7ED?text=Naan&font=Roboto"},
+                    {id: 'menu-item-7-4', name: "Jeera Rice", price: "₹150", imageUrl: "https://placehold.co/80x80/32CD32/FFF7ED?text=Jeera%0ARice&font=Roboto"}
                 ]
             }
         ];
@@ -1634,11 +1663,32 @@
              // Populate Items Ordered
              receiptItemsDiv.innerHTML = '';
              if (order.items.bag) {
-                 receiptItemsDiv.innerHTML += `<p>${order.items.bag.bagName} (${order.items.bag.size}) - ${order.items.bag.price}</p>`;
+                  // Display image for the bag in the receipt
+                  const bagRestaurant = mysteryBagsData.find(r => r.id === order.items.bag.id); // Assuming bag.id matches restaurant id
+                  const bagImageUrl = bagRestaurant ? bagRestaurant.imageUrl : 'https://placehold.co/40x40/eee/333?text=Bag';
+                  receiptItemsDiv.innerHTML += `
+                      <div class="receipt-item-details">
+                          <img src="${bagImageUrl}" alt="${order.items.bag.bagName}">
+                          <div class="item-info">
+                              <span>${order.items.bag.bagName} (${order.items.bag.size})</span>
+                              <span class="price">${order.items.bag.price}</span>
+                          </div>
+                      </div>
+                  `;
              }
              if (order.items.menuItems.length > 0) {
                  order.items.menuItems.forEach(item => {
-                     receiptItemsDiv.innerHTML += `<p>${item.name} - ${item.price}</p>`;
+                     // Display image for menu items in the receipt
+                      const itemImageUrl = item.imageUrl || 'https://placehold.co/40x40/eee/333?text=Item'; // Use item's image or a placeholder
+                     receiptItemsDiv.innerHTML += `
+                         <div class="receipt-item-details">
+                              <img src="${itemImageUrl}" alt="${item.name}">
+                              <div class="item-info">
+                                  <span>${item.name}</span>
+                                  <span class="price">${item.price}</span>
+                              </div>
+                         </div>
+                     `;
                  });
              }
               if (!order.items.bag && order.items.menuItems.length === 0) {
@@ -1946,13 +1996,17 @@
                      modalPickupTimesContainer.innerHTML = `<p class="text-gray-500">No specific pickup times listed.</p>`;
                 }
 
-                // Populate the full menu with "Add" buttons for each item
+                // Populate the full menu with "Add" buttons and images for each item
                 modalFullMenuContainer.innerHTML = '';
                 if (bag.fullMenu && bag.fullMenu.length > 0) {
                     bag.fullMenu.forEach(item => {
+                         const itemImageUrl = item.imageUrl || 'https://placehold.co/80x80/eee/333?text=Item'; // Use item's image or a placeholder
                         const menuItemHtml = `
                             <div class="flex justify-between menu-item">
-                                <span>${item.name}</span>
+                                <div class="flex items-center gap-3">
+                                     <img src="${itemImageUrl}" alt="${item.name}" class="w-12 h-12 object-cover rounded-md">
+                                     <span>${item.name}</span>
+                                </div>
                                 <div class="flex items-center gap-2">
                                     <span>${item.price}</span>
                                     <button class="add-to-cart-btn" onclick="addToCart({ type: 'menuItem', item: ${JSON.stringify(item).replace(/"/g, '\'')} })">Add</button>
@@ -2168,11 +2222,17 @@
                 const bag = currentModalCart.bag;
                 const bagPrice = parseFloat(bag.price.replace('₹', '')); // Parse price string to number
                 total += bagPrice;
+                 // Display image for the bag in the cart
+                 const bagRestaurant = mysteryBagsData.find(r => r.id === bag.id); // Assuming bag.id matches restaurant id for simplicity
+                 const bagImageUrl = bagRestaurant ? bagRestaurant.imageUrl : 'https://placehold.co/80x80/eee/333?text=Bag';
                 const bagItemHtml = `
                     <div class="flex justify-between items-center border-b pb-2">
-                        <div>
-                            <p class="font-semibold text-gray-800">${currentRestaurantData.restaurantName} - ${bag.bagName} (${bag.size})</p>
-                            <p class="text-xs text-gray-600">${bag.type}</p>
+                        <div class="flex items-center gap-3">
+                             <img src="${bagImageUrl}" alt="${bag.bagName}" class="w-12 h-12 object-cover rounded-md">
+                             <div>
+                                 <p class="font-semibold text-gray-800">${currentRestaurantData.restaurantName} - ${bag.bagName} (${bag.size})</p>
+                                 <p class="text-xs text-gray-600">${bag.type}</p>
+                             </div>
                         </div>
                         <div class="flex items-center gap-2">
                             <p class="text-base font-bold text-FF6B00">${bag.price}</p>
@@ -2188,9 +2248,13 @@
                  currentModalCart.menuItems.forEach(item => {
                      const itemPrice = parseFloat(item.price.replace('₹', '')); // Parse price string to number
                      total += itemPrice;
+                      const itemImageUrl = item.imageUrl || 'https://placehold.co/80x80/eee/333?text=Item'; // Use item's image or a placeholder
                      const menuItemHtml = `
                          <div class="flex justify-between items-center border-b pb-2">
-                              <p class="text-gray-700">${currentRestaurantData.restaurantName} - ${item.name}</p>
+                             <div class="flex items-center gap-3">
+                                  <img src="${itemImageUrl}" alt="${item.name}" class="w-12 h-12 object-cover rounded-md">
+                                  <p class="text-gray-700">${currentRestaurantData.restaurantName} - ${item.name}</p>
+                             </div>
                              <div class="flex items-center gap-2">
                                  <p class="text-base text-gray-600">${item.price}</p>
                                  <button class="remove-item-btn" onclick="removeFromCart('menuItem', '${item.id}')">Remove</button>
@@ -2553,10 +2617,11 @@
                      currentModalCart.menuItems.forEach(item => {
                           // Find the restaurant data for the menu item (assuming it's from the same restaurant as the bag if a bag exists, otherwise need to store restaurant ID with menu item)
                           const itemRestaurant = currentRestaurantData || (currentModalCart.bag ? mysteryBagsData.find(r => r.id === currentModalCart.bag.id) : null); // Simplified
+                           const itemImageUrl = item.imageUrl || 'https://placehold.co/50x50/eee/333?text=Item'; // Use item's image or a placeholder
                           const menuItemHtml = `
                              <div class="persistent-cart-item">
                                  <div class="item-details">
-                                     <img src="https://placehold.co/50x50/eee/333?text=Item" alt="${item.name}">
+                                     <img src="${itemImageUrl}" alt="${item.name}">
                                      <div class="item-info">
                                          <span>${itemRestaurant ? itemRestaurant.restaurantName + ' - ' : ''}${item.name}</span>
                                          <span class="price">${item.price}</span>
