@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="manifest" href="/manifest.json">
     <style>
         /* Custom styles to replicate Madang's look */
         body {
@@ -210,22 +211,22 @@
              display: block;
          }
 
-         /* Specific styles for the login screen to match the overall theme */
-        #loginScreen {
+         /* Specific styles for the login/signup/otp screens to match the overall theme */
+        #authScreen {
             background-color: #f9f9f9;
         }
-        .login-card {
+        .auth-card {
             background-color: #fff;
             border-radius: 8px;
             padding: 2.5rem;
             box-shadow: 0 6px 20px rgba(0,0,0,0.1);
         }
-        .login-card h1 {
+        .auth-card h1 {
             color: #1f2937;
             font-size: 2.2rem; /* Adjusted login title size */
             font-weight: 700;
         }
-         .login-card .primary-button {
+         .auth-card .primary-button {
              padding: 14px 28px;
              font-size: 1rem;
          }
@@ -241,9 +242,34 @@
                border-color: #0da487;
                box-shadow: 0 0 0 1px #0da487;
            }
-           .login-card p {
+           .auth-card p {
                color: #4b5563;
            }
+
+           .auth-view {
+               display: none;
+           }
+            .auth-view.active {
+                display: block;
+            }
+
+            /* OTP Input Styling */
+            .otp-input {
+                width: 60px; /* Adjust width as needed */
+                height: 60px; /* Adjust height as needed */
+                text-align: center;
+                font-size: 1.5rem; /* Adjust font size */
+                margin: 0 5px; /* Space between inputs */
+                border: 1px solid #d1d5db;
+                border-radius: 4px;
+                transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            }
+             .otp-input:focus {
+                 outline: none;
+                 border-color: #0da487;
+                 box-shadow: 0 0 0 1px #0da487;
+             }
+
 
         /* Header styling */
         .app-header {
@@ -563,6 +589,18 @@
                         background-color: #fee2e2;
                         color: #991b1b;
                     }
+                    .order-item .view-receipt-button {
+                        background-color: #e5e7eb;
+                        color: #4b5563;
+                        padding: 6px 12px;
+                        border-radius: 4px;
+                        font-size: 0.8rem;
+                        font-weight: 500;
+                        transition: background-color 0.2s ease;
+                    }
+                     .order-item .view-receipt-button:hover {
+                         background-color: #d1d5db;
+                     }
 
 
                /* Profile Management Styles */
@@ -703,13 +741,17 @@
                         display: flex;
                         align-items: center;
                         justify-content: center;
-                        margin-right: 15px;
                         font-size: 0.9rem;
+                        /* Added transition for animation */
+                        transition: background-color 0.5s ease, color 0.5s ease;
                     }
                      .progress-step.completed .icon {
                          background-color: #0da487;
                          color: white;
                      }
+                    .progress-step .text {
+                        margin-left: 15px; /* Space between icon and text */
+                    }
                     .progress-step .text span {
                         display: block;
                         font-size: 0.9rem;
@@ -724,6 +766,8 @@
                         background-color: #eee;
                         margin-left: 14px; /* Align with icon center */
                         height: 20px;
+                        /* Added transition for animation */
+                        transition: background-color 0.5s ease;
                     }
                      .progress-step:last-child .progress-line {
                          display: none;
@@ -745,26 +789,118 @@
                 border: 1px solid #ccc;
             }
 
+            /* Receipt View Styles */
+            #receiptView {
+                 background-color: #f9f9f9;
+                 padding-top: 20px;
+            }
+             #receiptView h2 {
+                 font-size: 1.8rem;
+                 font-weight: 700;
+                 color: #1f2937;
+                 margin-bottom: 20px;
+             }
+             .receipt-section {
+                 margin-bottom: 20px;
+                 padding: 20px;
+                 background-color: #fff;
+                 border-radius: 8px;
+                 box-shadow: 0 1px 5px rgba(0,0,0,0.05);
+                 border: 1px solid #eee;
+             }
+              .receipt-section h3 {
+                  font-size: 1.4rem;
+                  font-weight: 600;
+                  color: #1f2937;
+                  margin-bottom: 15px;
+                  border-bottom: 1px dashed #eee;
+                  padding-bottom: 10px;
+              }
+              .receipt-details p {
+                  margin-bottom: 8px;
+                  font-size: 0.9rem;
+                  color: #4b5563;
+              }
+               .receipt-details strong {
+                   color: #1f2937;
+               }
+
     </style>
 </head>
 <body class="antialiased">
 
-    <div id="loginScreen" class="fixed inset-0 z-50 flex flex-col items-center justify-center p-4">
-        <div class="login-card text-center w-full max-w-sm">
+    <div id="authScreen" class="fixed inset-0 z-50 flex flex-col items-center justify-center p-4">
+        <div class="auth-card text-center w-full max-w-sm">
             <img src="https://placehold.co/100x100/0da487/ffffff?text=MystiMeal&font=Roboto" alt="MystiMeal Logo" class="mx-auto mb-6 rounded-full">
             <h1 class="text-4xl font-bold text-gray-800 mb-3">MystiMeal</h1>
             <p class="text-gray-600 mb-8">Save food. Save money. Stay curious.</p>
-            <p class="text-left text-sm text-gray-500 mb-2">Enter your phone number to sign in</p>
-            <div class="phone-input-container mb-8">
-                <span>🇮🇳 +91</span> <input type="tel" placeholder="9876543210" class="w-full"> </div>
-            <button id="loginContinueButton" class="w-full primary-button font-semibold py-3 px-6 rounded-lg shadow-md transition duration-150">
-                Continue
-            </button>
+
+            <div id="loginView" class="auth-view active">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">Login</h2>
+                <p class="text-left text-sm text-gray-500 mb-2">Enter your phone number to sign in</p>
+                <div class="phone-input-container mb-8 flex items-center border border-gray-300 rounded-md">
+                    <span class="px-3 py-2 bg-gray-100 border-r border-gray-300">🇮🇳 +91</span>
+                    <input type="tel" id="loginPhone" placeholder="9876543210" class="w-full px-3 py-2 rounded-r-md focus:outline-none">
+                </div>
+                <button id="loginButton" class="w-full primary-button font-semibold py-3 px-6 rounded-lg shadow-md transition duration-150">
+                    Login
+                </button>
+                <p class="text-center text-sm text-gray-500 mt-4">
+                    Don't have an account? <button class="text-0da487 hover:underline font-medium" onclick="showSignupView()">Sign Up</button>
+                </p>
+            </div>
+
+            <div id="signupView" class="auth-view">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">Sign Up</h2>
+                <div class="space-y-4">
+                    <div>
+                        <label for="signupName" class="text-left text-sm font-medium text-gray-700 block mb-1">Name</label>
+                        <input type="text" id="signupName" placeholder="Your Name" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-0da487 focus:ring-1 focus:ring-0da487">
+                    </div>
+                    <div>
+                        <label for="signupPhone" class="text-left text-sm font-medium text-gray-700 block mb-1">Phone Number</label>
+                         <div class="phone-input-container flex items-center border border-gray-300 rounded-md">
+                             <span class="px-3 py-2 bg-gray-100 border-r border-gray-300">🇮🇳 +91</span>
+                             <input type="tel" id="signupPhone" placeholder="9876543210" class="w-full px-3 py-2 rounded-r-md focus:outline-none">
+                         </div>
+                    </div>
+                    <div>
+                        <label for="signupEmail" class="text-left text-sm font-medium text-gray-700 block mb-1">Email (Optional)</label>
+                        <input type="email" id="signupEmail" placeholder="your.email@example.com" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-0da487 focus:ring-1 focus:ring-0da487">
+                    </div>
+                </div>
+                <button id="signupButton" class="w-full primary-button font-semibold py-3 px-6 rounded-lg shadow-md transition duration-150 mt-8">
+                    Sign Up
+                </button>
+                <p class="text-center text-sm text-gray-500 mt-4">
+                    Already have an account? <button class="text-0da487 hover:underline font-medium" onclick="showLoginView()">Login</button>
+                </p>
+            </div>
+
+             <div id="otpView" class="auth-view">
+                 <h2 class="text-2xl font-bold text-gray-800 mb-6">Verify Phone Number</h2>
+                 <p class="text-center text-gray-600 mb-6">Enter the 4-digit OTP sent to <span id="otpPhoneNumber"></span></p>
+                 <div class="flex justify-center space-x-2 mb-8">
+                     <input type="text" class="otp-input" maxlength="1" id="otp1">
+                     <input type="text" class="otp-input" maxlength="1" id="otp2">
+                     <input type="text" class="otp-input" maxlength="1" id="otp3">
+                     <input type="text" class="otp-input" maxlength="1" id="otp4">
+                 </div>
+                 <button id="verifyOtpButton" class="w-full primary-button font-semibold py-3 px-6 rounded-lg shadow-md transition duration-150">
+                     Verify OTP
+                 </button>
+                  <p class="text-center text-sm text-gray-500 mt-4">
+                      Didn't receive the code? <button class="text-0da487 hover:underline font-medium" id="resendOtpButton">Resend OTP</button>
+                  </p>
+             </div>
+
+
+            <p id="authMessage" class="text-center mt-4 text-sm text-gray-500"></p>
             <p class="text-xs text-gray-400 mt-6">By continuing, you agree to our <a href="#" class="underline text-gray-500 hover:text-gray-700">Terms and Conditions</a></p>
         </div>
     </div>
 
-    <div id="mainAppContent" class="">
+    <div id="mainAppContent" class="hidden">
         <header class="app-header sticky top-0 z-40">
             <div class="container mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
                 <h1 class="text-3xl font-bold tracking-tight text-gray-800">MystiMeal</h1>
@@ -778,7 +914,7 @@
         <div id="mainListingView">
              <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
                  <div class="mb-8">
-                     <h2 class="text-2xl sm:text-3xl font-bold text-gray-800">Good afternoon, User!</h2>
+                     <h2 class="text-2xl sm:text-3xl font-bold text-gray-800">Good afternoon, <span id="greetingUserName">User</span>!</h2>
                      <p class="text-gray-600 mt-1">Discover Surprise Bags Near You - Hyderabad</p>
                  </div>
 
@@ -849,6 +985,8 @@
                     <button class="save-button" onclick="saveProfile()">Save Profile</button>
                 </div>
             </div>
+
+            <button class="warning-button mt-8" onclick="signOut()">Sign Out</button>
         </div>
 
         <div id="orderProgressView" class="hidden container mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -890,6 +1028,37 @@
                      </div>
                  </div>
                  <p id="orderStatusMessage" class="text-center mt-6 text-lg font-semibold text-gray-700"></p>
+             </div>
+        </div>
+
+        <div id="receiptView" class="hidden container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+             <button class="secondary-button mb-8" onclick="showUserAccount()">Back to Account</button>
+             <h2>Order Receipt #<span id="receiptOrderId"></span></h2>
+             <div class="receipt-section">
+                 <h3>Order Summary</h3>
+                 <div id="receiptSummary" class="receipt-details">
+                     </div>
+             </div>
+             <div class="receipt-section">
+                 <h3>Items Ordered</h3>
+                 <div id="receiptItems" class="receipt-details space-y-2">
+                     </div>
+             </div>
+             <div class="receipt-section">
+                 <h3>Delivery/Pickup Details</h3>
+                 <div id="receiptDeliveryDetails" class="receipt-details">
+                     </div>
+             </div>
+             <div class="receipt-section">
+                 <h3>Payment Information</h3>
+                 <div id="receiptPaymentDetails" class="receipt-details">
+                     </div>
+             </div>
+             <div class="receipt-section">
+                 <div class="flex justify-between items-center text-lg font-bold text-gray-800">
+                      <span>Total:</span>
+                      <span id="receiptTotal">₹0</span>
+                 </div>
              </div>
         </div>
 
@@ -991,7 +1160,7 @@
                          <div class="space-y-4">
                              <div class="delivery-priority-option">
                                  <input type="radio" name="deliveryPriority" value="regular" id="priorityRegular" checked>
-                                 <label for="priorityRegular">Regular Delivery</label>
+                                 <label for="priorityPriority">Regular Delivery</label>
                              </div>
                              <div class="delivery-priority-option">
                                  <input type="radio" name="deliveryPriority" value="priority" id="priorityPriority">
@@ -1009,10 +1178,48 @@
                                  <input type="radio" name="paymentMethod" value="card" id="paymentCard">
                                  <label for="paymentCard">Credit/Debit Card (Simulated)</label>
                              </div>
+                              <div id="cardDetails" class="space-y-4 pl-6 mt-2 hidden">
+                                   <div>
+                                       <label for="cardNumber">Card Number (Dummy)</label>
+                                       <input type="text" id="cardNumber" placeholder="XXXX XXXX XXXX XXXX">
+                                   </div>
+                                   <div class="flex gap-4">
+                                       <div class="flex-1">
+                                           <label for="expiryDate">Expiry Date (MM/YY)</label>
+                                           <input type="text" id="expiryDate" placeholder="MM/YY">
+                                       </div>
+                                       <div class="flex-1">
+                                            <label for="cvv">CVV</label>
+                                            <input type="text" id="cvv" placeholder="XXX">
+                                       </div>
+                                   </div>
+                                   <div>
+                                        <label for="cardName">Name on Card</label>
+                                        <input type="text" id="cardName" placeholder="Cardholder Name">
+                                   </div>
+                              </div>
+
                              <div class="payment-method-option">
                                  <input type="radio" name="paymentMethod" value="upi" id="paymentUpi">
                                  <label for="paymentUpi">UPI (Simulated)</label>
                              </div>
+                              <div id="upiDetails" class="space-y-4 pl-6 mt-2 hidden">
+                                   <div>
+                                       <label for="upiId">UPI ID (Dummy)</label>
+                                       <input type="text" id="upiId" placeholder="your_upi_id@bank">
+                                   </div>
+                                   <div>
+                                       <label for="upiApp">Select UPI App</label>
+                                       <select id="upiApp">
+                                           <option value="">Select App</option>
+                                           <option value="gpay">Google Pay</option>
+                                           <option value="phonepe">PhonePe</option>
+                                           <option value="paytm">Paytm</option>
+                                           <option value="other">Other</option>
+                                       </select>
+                                   </div>
+                              </div>
+
                              <div class="payment-method-option">
                                   <input type="radio" name="paymentMethod" value="cod" id="paymentCod">
                                   <label for="paymentCod">Cash on Delivery (Simulated)</label>
@@ -1050,7 +1257,8 @@
                 restaurantName: "Pista House",
                 location: "Hyderabad",
                 category: "Biryani", // Specific category
-                imageUrl: "https://placehold.co/600x400/FF8C00/FFF7ED?text=Pista+House+Biryani&font=Roboto", // Updated font in placeholder
+                // You can replace this with an actual image URL for Pista House Biryani
+                imageUrl: "https://placehold.co/600x400/FF8C00/FFF7ED?text=Pista+House%0ABiryani&font=Roboto",
                 bagSizes: [
                      { id: 'bag-1-small', size: 'Small', type: 'Small Surprise Biryani Bag', description: 'A smaller portion of surplus biryani.', price: '₹99' },
                      { id: 'bag-1-medium', size: 'Medium', type: 'Medium Surprise Biryani Bag', description: 'A good portion of surplus biryani.', price: '₹149' },
@@ -1070,7 +1278,8 @@
                 restaurantName: "The Brew Room",
                 location: "Hyderabad",
                 category: "Cafe", // Specific category
-                imageUrl: "https://placehold.co/600x400/4682B4/FFF7ED?text=Brew+Room+Cafe&font=Roboto", // Updated font in placeholder
+                // You can replace this with an actual image URL for The Brew Room Cafe
+                imageUrl: "https://placehold.co/600x400/4682B4/FFF7ED?text=Brew+Room%0ACafe&font=Roboto",
                  bagSizes: [
                      { id: 'bag-2-standard', size: 'Standard', type: 'Breakfast Combo', description: 'A surprise assortment of our popular breakfast items.', price: '₹99' }
                  ],
@@ -1087,7 +1296,8 @@
                 restaurantName: "Sweet Surrender Bakery",
                 location: "Hyderabad",
                 category: "Bakery", // Specific category
-                imageUrl: "https://placehold.co/600x400/FFC0CB/333?text=Sweet+Surrender+Bakery&font=Roboto", // Updated font in placeholder
+                // You can replace this with an actual image URL for Sweet Surrender Bakery
+                imageUrl: "https://placehold.co/600x400/FFC0CB/333?text=Sweet+Surrender%0ABakery&font=Roboto",
                  bagSizes: [
                      { id: 'bag-3-standard', size: 'Standard', type: 'Pastry Assortment', description: 'A delightful selection of leftover pastries.', price: '₹75' }
                  ],
@@ -1104,7 +1314,8 @@
                 restaurantName: "Quick Bites Cafe",
                 location: "Hyderabad",
                 category: "Fast Food", // Specific category
-                imageUrl: "https://placehold.co/600x400/32CD32/FFF7ED?text=Quick+Bites+Cafe&font=Roboto", // Updated font in placeholder
+                // You can replace this with an actual image URL for Quick Bites Cafe
+                imageUrl: "https://placehold.co/600x400/32CD32/FFF7ED?text=Quick+Bites%0AFast+Food&font=Roboto",
                  bagSizes: [
                      { id: 'bag-4-standard', size: 'Standard', type: 'Mixed Snacks', description: 'A surprise bag filled with snacks.', price: '₹60' }
                  ],
@@ -1121,7 +1332,8 @@
                 restaurantName: "Oven Story Pizza",
                 location: "Hyderabad",
                 category: "Fast Food", // Specific category
-                imageUrl: "https://placehold.co/600x400/FF4500/FFF7ED?text=Oven+Story+Pizza&font=Roboto", // Updated font in placeholder
+                // You can replace this with an actual image URL for Oven Story Pizza
+                imageUrl: "https://placehold.co/600x400/FF4500/FFF7ED?text=Oven+Story%0APizza&font=Roboto",
                  bagSizes: [
                      { id: 'bag-5-standard', size: 'Standard', type: 'Pizza Slice Combo', description: 'Get 2 large surprise slices.', price: '₹120' }
                  ],
@@ -1138,7 +1350,8 @@
                 restaurantName: "Gourmet Sweets",
                 location: "Hyderabad",
                 category: "Sweets", // Specific category
-                imageUrl: "https://placehold.co/600x400/FFB6C1/333?text=Gourmet+Sweets&font=Roboto", // Updated font in placeholder
+                // You can replace this with an actual image URL for Gourmet Sweets
+                imageUrl: "https://placehold.co/600x400/FFB6C1/333?text=Gourmet%0ASweets&font=Roboto",
                  bagSizes: [
                      { id: 'bag-6-small', size: 'Small', type: 'Small Sweets Box', description: 'A small selection of daily leftover sweets.', price: '₹150' },
                      { id: 'bag-6-large', size: 'Large', type: 'Large Sweets Box', description: 'A larger assortment of fresh sweets.', price: '₹250' }
@@ -1156,7 +1369,8 @@
                 restaurantName: "Spice Junction",
                 location: "Hyderabad",
                 category: "Meals", // General Meals category for other dishes
-                imageUrl: "https://placehold.co/600x400/A0522D/FFF7ED?text=Spice+Junction&font=Roboto", // Updated font in placeholder
+                // You can replace this with an actual image URL for Spice Junction or Indian Meals
+                imageUrl: "https://placehold.co/600x400/A0522D/FFF7ED?text=Spice+Junction%0AMeals&font=Roboto",
                  bagSizes: [
                      { id: 'bag-7-standard', size: 'Standard', type: 'Curry & Roti Surprise', description: 'A surprise curry with rotis.', price: '₹120' }
                  ],
@@ -1178,19 +1392,35 @@
          ];
 
         // Simulated User Data and Order History (will be stored in localStorage)
-        let userData = JSON.parse(localStorage.getItem('mystimealUserData')) || {
-            name: 'User Name',
-            phone: '+91 9876543210',
-            email: 'user@example.com',
-            address: '123 Main St, Hyderabad'
-        };
+        // Check if user data exists in local storage, otherwise use default
+        let userData = JSON.parse(localStorage.getItem('mystimealUserData')) || null;
 
+        // Check if order history exists in local storage, otherwise use empty array
         let orderHistory = JSON.parse(localStorage.getItem('mystimealOrderHistory')) || [];
 
         // Get references to key DOM elements for easier access
+        const authScreen = document.getElementById('authScreen'); // Reference to the new auth screen
+        const loginView = document.getElementById('loginView'); // Reference to the login view
+        const signupView = document.getElementById('signupView'); // Reference to the signup view
+        const otpView = document.getElementById('otpView'); // Reference to the OTP view
+        const loginPhoneInput = document.getElementById('loginPhone'); // Reference to login phone input
+        const loginButton = document.getElementById('loginButton'); // Reference to login button
+        const signupNameInput = document.getElementById('signupName'); // Reference to signup name input
+        const signupPhoneInput = document.getElementById('signupPhone'); // Reference to signup phone input
+        const signupEmailInput = document.getElementById('signupEmail'); // Reference to signup email input
+        const signupButton = document.getElementById('signupButton'); // Reference to signup button
+        const otpPhoneNumberSpan = document.getElementById('otpPhoneNumber'); // Reference to OTP phone number display
+        const otpInputs = document.querySelectorAll('.otp-input'); // References to individual OTP inputs
+        const verifyOtpButton = document.getElementById('verifyOtpButton'); // Reference to verify OTP button
+        const resendOtpButton = document.getElementById('resendOtpButton'); // Reference to resend OTP button
+        const authMessage = document.getElementById('authMessage'); // Reference to auth message paragraph
+
+
+        const mainAppContent = document.getElementById('mainAppContent'); // Reference to the main app content container
         const mainListingView = document.getElementById('mainListingView'); // Reference to the main listing view
         const userAccountScreen = document.getElementById('userAccountScreen'); // Reference to the user account screen
         const orderProgressView = document.getElementById('orderProgressView'); // Reference to the order progress view
+        const receiptView = document.getElementById('receiptView'); // Reference to the new receipt view
 
         const bagListingsContainer = document.getElementById('bagListings');
         const modal = document.getElementById('bagDetailModal');
@@ -1219,6 +1449,17 @@
         const deliveryPriorityRadios = document.querySelectorAll('input[name="deliveryPriority"]');
         const paymentMethodRadios = document.querySelectorAll('input[name="paymentMethod"]');
 
+        // References to dummy payment input fields
+        const cardDetailsDiv = document.getElementById('cardDetails');
+        const cardNumberInput = document.getElementById('cardNumber');
+        const expiryDateInput = document.getElementById('expiryDate');
+        const cvvInput = document.getElementById('cvv');
+        const cardNameInput = document.getElementById('cardName');
+        const upiDetailsDiv = document.getElementById('upiDetails');
+        const upiIdInput = document.getElementById('upiId');
+        const upiAppSelect = document.getElementById('upiApp');
+
+
         // References to user account elements
         const persistentCartContainer = document.getElementById('persistentCartItems');
         const persistentCartItemCountSpan = document.getElementById('persistentCartItemCount');
@@ -1228,6 +1469,7 @@
         const profilePhoneInput = document.getElementById('profilePhone');
         const profileEmailInput = document.getElementById('profileEmail');
         const profileAddressInput = document.getElementById('profileAddress');
+        const greetingUserNameSpan = document.getElementById('greetingUserName'); // Reference to greeting name
 
         // References to order progress elements
         const currentOrderIdSpan = document.getElementById('currentOrderId');
@@ -1236,16 +1478,14 @@
         const stepDelivered = document.getElementById('stepDelivered');
         const orderStatusMessage = document.getElementById('orderStatusMessage');
 
+        // References to receipt view elements
+        const receiptOrderIdSpan = document.getElementById('receiptOrderId');
+        const receiptSummaryDiv = document.getElementById('receiptSummary');
+        const receiptItemsDiv = document.getElementById('receiptItems');
+        const receiptDeliveryDetailsDiv = document.getElementById('receiptDeliveryDetails');
+        const receiptPaymentDetailsDiv = document.getElementById('receiptPaymentDetails');
+        const receiptTotalSpan = document.getElementById('receiptTotal');
 
-        // References to login screen elements
-        const loginScreen = document.getElementById('loginScreen');
-        const mainAppContent = document.getElementById('mainAppContent');
-        const loginContinueButton = document.getElementById('loginContinueButton');
-
-        // References to filtering and search elements
-        const categoryFilterButtons = document.querySelectorAll('.category-button'); // Updated selector
-        const searchInput = document.getElementById('restaurantSearchInput');
-        const searchButton = document.getElementById('searchButton');
 
         // State variables for filtering, searching, and current restaurant data
         let currentCategory = 'All';
@@ -1260,6 +1500,10 @@
 
         // State variable for the current modal view
         let currentModalView = 'bagMenuDetail'; // Possible values: 'bagMenuDetail', 'cart', 'checkoutAddress', 'checkoutTime', 'checkoutPayment'
+
+        // Simulated OTP
+        let simulatedOtp = '';
+        let currentAuthPhone = ''; // Store the phone number being authenticated
 
         // --- Local Storage Functions ---
         function saveCartToLocalStorage() {
@@ -1284,19 +1528,67 @@
 
         function saveUserData() {
              localStorage.setItem('mystimealUserData', JSON.stringify(userData));
+             updateGreetingUserName(); // Update the greeting on the main page
         }
 
         // --- View Switching Functions ---
+        function showAuthScreen() {
+            authScreen.classList.remove('hidden');
+            mainAppContent.classList.add('hidden');
+            userAccountScreen.classList.add('hidden');
+            orderProgressView.classList.add('hidden');
+            receiptView.classList.add('hidden'); // Hide receipt view
+            // Show login view by default when showing auth screen
+            showLoginView();
+        }
+
+        function showLoginView() {
+            loginView.classList.add('active');
+            signupView.classList.remove('active');
+            otpView.classList.remove('active');
+             authMessage.textContent = ''; // Clear any previous auth messages
+        }
+
+        function showSignupView() {
+            loginView.classList.remove('active');
+            signupView.classList.add('active');
+            otpView.classList.remove('active');
+             authMessage.textContent = ''; // Clear any previous auth messages
+        }
+
+         function showOtpView(phone) {
+             loginView.classList.remove('active');
+             signupView.classList.remove('active');
+             otpView.classList.add('active');
+             otpPhoneNumberSpan.textContent = '+91 ' + phone; // Display the phone number
+             authMessage.textContent = ''; // Clear any previous auth messages
+             clearOtpInputs(); // Clear previous OTP inputs
+         }
+
+
+        function showMainAppContent() {
+             authScreen.classList.add('hidden');
+             mainAppContent.classList.remove('hidden');
+             userAccountScreen.classList.add('hidden');
+             orderProgressView.classList.add('hidden');
+             receiptView.classList.add('hidden'); // Hide receipt view
+             filterAndRenderBags(); // Render bags when showing main content
+             loadCartFromLocalStorage(); // Load persistent cart
+             updateGreetingUserName(); // Update greeting name
+        }
+
         function showMainListing() {
             mainListingView.classList.remove('hidden');
             userAccountScreen.classList.add('hidden');
             orderProgressView.classList.add('hidden');
+            receiptView.classList.add('hidden'); // Hide receipt view
         }
 
         function showUserAccount() {
             mainListingView.classList.add('hidden');
             userAccountScreen.classList.remove('hidden');
             orderProgressView.classList.add('hidden');
+            receiptView.classList.add('hidden'); // Hide receipt view
              renderOrderHistory(); // Render history when showing account
              renderUserProfile(); // Render profile when showing account
              renderPersistentCart(); // Render persistent cart when showing account
@@ -1305,22 +1597,240 @@
         function showOrderProgress(orderId) {
             mainListingView.classList.add('hidden');
             userAccountScreen.classList.add('hidden');
-            orderProgressView.classList.remove('hidden');
+            orderProgressView.classList.remove('hidden'); // Ensure order progress view is shown
+            receiptView.classList.add('hidden'); // Hide receipt view
             currentOrderIdSpan.textContent = orderId;
             // Simulate order progress steps (basic example)
             updateOrderProgressSteps('placed');
             // In a real app, you'd fetch the actual order status and update the steps
         }
 
-        // --- Login Simulation ---
-        loginContinueButton.addEventListener('click', () => {
-            console.log("Login button clicked. Hiding login, showing main content."); // Debug log
-            loginScreen.classList.add('hidden'); // Hide login screen
-            mainAppContent.classList.remove('hidden'); // Show main app content
-            console.log("Calling filterAndRenderBags after login."); // Debug log
-            filterAndRenderBags(); // Render the initial list of bags after login
-            loadCartFromLocalStorage(); // Load persistent cart on login
+         function showReceiptDetails(orderId) {
+             mainListingView.classList.add('hidden');
+             userAccountScreen.classList.add('hidden');
+             orderProgressView.classList.add('hidden');
+             receiptView.classList.remove('hidden'); // Show receipt view
+
+             const order = orderHistory.find(o => o.id === orderId);
+             if (!order) {
+                 receiptSummaryDiv.innerHTML = '<p>Order not found.</p>';
+                 receiptItemsDiv.innerHTML = '';
+                 receiptDeliveryDetailsDiv.innerHTML = '';
+                 receiptPaymentDetailsDiv.innerHTML = '';
+                 receiptTotalSpan.textContent = '₹0';
+                 receiptOrderIdSpan.textContent = 'N/A';
+                 return;
+             }
+
+             receiptOrderIdSpan.textContent = order.id;
+
+             // Populate Order Summary
+             receiptSummaryDiv.innerHTML = `
+                 <p><strong>Restaurant:</strong> ${order.restaurant}</p>
+                 <p><strong>Order Date:</strong> ${order.date}</p>
+                 <p><strong>Status:</strong> ${order.status.charAt(0).toUpperCase() + order.status.slice(1)}</p>
+             `;
+
+             // Populate Items Ordered
+             receiptItemsDiv.innerHTML = '';
+             if (order.items.bag) {
+                 receiptItemsDiv.innerHTML += `<p>${order.items.bag.bagName} (${order.items.bag.size}) - ${order.items.bag.price}</p>`;
+             }
+             if (order.items.menuItems.length > 0) {
+                 order.items.menuItems.forEach(item => {
+                     receiptItemsDiv.innerHTML += `<p>${item.name} - ${item.price}</p>`;
+                 });
+             }
+              if (!order.items.bag && order.items.menuItems.length === 0) {
+                  receiptItemsDiv.innerHTML = '<p>No items listed.</p>';
+              }
+
+
+             // Populate Delivery/Pickup Details
+             receiptDeliveryDetailsDiv.innerHTML = `
+                 <p><strong>Option:</strong> ${order.deliveryOption.charAt(0).toUpperCase() + order.deliveryOption.slice(1)}</p>
+             `;
+             if (order.deliveryOption === 'delivery') {
+                 receiptDeliveryDetailsDiv.innerHTML += `
+                     <p><strong>Address:</strong> ${order.address || 'N/A'}</p>
+                     <p><strong>Dropoff Instructions:</strong> ${order.dropoff || 'None'}</p>
+                     <p><strong>Priority:</strong> ${order.deliveryPriority.charAt(0).toUpperCase() + order.deliveryPriority.slice(1)}</p>
+                 `;
+             }
+              receiptDeliveryDetailsDiv.innerHTML += `
+                  <p><strong>Preferred Time:</strong> ${order.preferredTime || 'Any'}</p>
+                  <p><strong>Time Zone:</strong> ${order.timeZone || 'N/A'}</p>
+              `;
+
+
+             // Populate Payment Information
+             receiptPaymentDetailsDiv.innerHTML = `
+                 <p><strong>Method:</strong> ${order.paymentMethod.charAt(0).toUpperCase() + order.paymentMethod.slice(1)}</p>
+             `;
+             if (order.paymentMethod === 'card' && order.paymentDetails && order.paymentDetails.card) {
+                 // Mask card number for display
+                 const maskedCardNumber = order.paymentDetails.card.number ? '**** **** **** ' + order.paymentDetails.card.number.slice(-4) : 'N/A';
+                 receiptPaymentDetailsDiv.innerHTML += `
+                     <p><strong>Card Number:</strong> ${maskedCardNumber}</p>
+                     <p><strong>Expiry Date:</strong> ${order.paymentDetails.card.expiry || 'N/A'}</p>
+                     <p><strong>Cardholder Name:</strong> ${order.paymentDetails.card.name || 'N/A'}</p>
+                 `;
+             } else if (order.paymentMethod === 'upi' && order.paymentDetails && order.paymentDetails.upi) {
+                  receiptPaymentDetailsDiv.innerHTML += `
+                      <p><strong>UPI ID:</strong> ${order.paymentDetails.upi.id || 'N/A'}</p>
+                      <p><strong>UPI App:</strong> ${order.paymentDetails.upi.app || 'N/A'}</p>
+                  `;
+             } else if (order.paymentMethod === 'cod') {
+                  receiptPaymentDetailsDiv.innerHTML += `<p>Payment will be collected on delivery.</p>`;
+             } else {
+                  receiptPaymentDetailsDiv.innerHTML += `<p>Payment details not available.</p>`;
+             }
+
+
+             // Populate Total
+             receiptTotalSpan.textContent = `₹${order.total}`;
+         }
+
+
+        // --- Authentication Logic (Simulated) ---
+        loginButton.addEventListener('click', () => {
+            const phone = loginPhoneInput.value.trim();
+            currentAuthPhone = phone; // Store phone number
+            // In a real app, you'd send this to a backend for authentication
+            // For this simulation, we'll just check if user data exists
+            if (userData && userData.phone === '+91 ' + phone) {
+                 // Simulate sending OTP
+                 simulateSendOtp(phone);
+                 showOtpView(phone); // Show OTP verification view
+            } else {
+                 authMessage.textContent = 'Invalid phone number or user not found. Please sign up.';
+                 authMessage.className = 'text-center mt-4 text-sm text-yellow-600';
+                 setTimeout(() => { authMessage.textContent = ''; authMessage.className = 'text-center mt-4 text-sm text-gray-500'; }, 3000);
+            }
         });
+
+        signupButton.addEventListener('click', () => {
+            const name = signupNameInput.value.trim();
+            const phone = signupPhoneInput.value.trim();
+            const email = signupEmailInput.value.trim();
+
+            if (!name || !phone) {
+                authMessage.textContent = 'Name and Phone Number are required for signup.';
+                authMessage.className = 'text-center mt-4 text-sm text-yellow-600';
+                setTimeout(() => { authMessage.textContent = ''; authMessage.className = 'text-center mt-4 text-sm text-gray-500'; }, 3000);
+                return;
+            }
+
+             currentAuthPhone = phone; // Store phone number
+
+            // In a real app, you'd send this to a backend to create a new user and send OTP
+            // For this simulation, we'll create a new user object (but not save yet) and simulate sending OTP
+            const newUser = {
+                name: name,
+                phone: '+91 ' + phone, // Store with country code for consistency
+                email: email,
+                address: '' // Default empty address
+            };
+
+             // Simulate sending OTP
+             simulateSendOtp(phone);
+             showOtpView(phone); // Show OTP verification view
+
+             // Store new user data temporarily until OTP is verified
+             sessionStorage.setItem('tempNewUser', JSON.stringify(newUser));
+
+            // Clear signup form fields
+            signupNameInput.value = '';
+            signupPhoneInput.value = '';
+            signupEmailInput.value = '';
+        });
+
+         verifyOtpButton.addEventListener('click', () => {
+             const enteredOtp = Array.from(otpInputs).map(input => input.value).join('');
+             // In a real app, you'd send the phone and entered OTP to the backend for verification
+             // For this simulation, we compare with the simulated OTP
+             if (enteredOtp === simulatedOtp) {
+                 authMessage.textContent = 'OTP verified successfully!';
+                 authMessage.className = 'text-center mt-4 text-sm text-green-600';
+
+                 // If there's temporary new user data, save it as the current user
+                 const tempNewUser = sessionStorage.getItem('tempNewUser');
+                 if (tempNewUser) {
+                     userData = JSON.parse(tempNewUser);
+                     saveUserData(); // Save the new user permanently
+                     sessionStorage.removeItem('tempNewUser'); // Clear temporary data
+                 } else {
+                      // If no temporary user, assume it was a login attempt and user data is already loaded
+                      // (In a real app, successful login verification would load user data)
+                 }
+
+
+                 setTimeout(() => {
+                     authMessage.textContent = '';
+                     authMessage.className = 'text-center mt-4 text-sm text-gray-500';
+                     showMainAppContent(); // Show main app content on successful verification
+                 }, 1000);
+             } else {
+                 authMessage.textContent = 'Invalid OTP. Please try again.';
+                 authMessage.className = 'text-center mt-4 text-sm text-yellow-600';
+                 clearOtpInputs(); // Clear OTP inputs on failure
+                 setTimeout(() => { authMessage.textContent = ''; authMessage.className = 'text-center mt-4 text-sm text-gray-500'; }, 3000);
+             }
+         });
+
+         resendOtpButton.addEventListener('click', () => {
+             // Simulate resending OTP using the stored phone number
+             if (currentAuthPhone) {
+                 simulateSendOtp(currentAuthPhone);
+                 authMessage.textContent = 'OTP resent!';
+                 authMessage.className = 'text-center mt-4 text-sm text-green-600';
+                 clearOtpInputs(); // Clear inputs for new OTP
+                 setTimeout(() => { authMessage.textContent = ''; authMessage.className = 'text-center mt-4 text-sm text-gray-500'; }, 2000);
+             } else {
+                  authMessage.textContent = 'Please enter your phone number first.';
+                  authMessage.className = 'text-center mt-4 text-sm text-yellow-600';
+                  setTimeout(() => { authMessage.textContent = ''; authMessage.className = 'text-center mt-4 text-sm text-gray-500'; }, 3000);
+             }
+         });
+
+
+         // Simulate sending an OTP (client-side)
+         function simulateSendOtp(phone) {
+             // Generate a random 4-digit OTP
+             simulatedOtp = Math.floor(1000 + Math.random() * 9000).toString();
+             console.log(`Simulated OTP for +91 ${phone}: ${simulatedOtp}`); // Log OTP to console for testing
+             authMessage.textContent = `OTP sent to +91 ${phone}. Check console for simulated OTP.`;
+             authMessage.className = 'text-center mt-4 text-sm text-green-600';
+         }
+
+         // Clear OTP input fields
+         function clearOtpInputs() {
+             otpInputs.forEach(input => input.value = '');
+             if (otpInputs.length > 0) {
+                 otpInputs[0].focus(); // Focus on the first input
+             }
+         }
+
+         // Auto-focus and move to the next OTP input
+         otpInputs.forEach((input, index) => {
+             input.addEventListener('input', () => {
+                 if (input.value.length === input.maxLength) {
+                     const nextInput = otpInputs[index + 1];
+                     if (nextInput) {
+                         nextInput.focus();
+                     }
+                 }
+             });
+             input.addEventListener('keydown', (event) => {
+                 if (event.key === 'Backspace' && input.value.length === 0) {
+                     const prevInput = otpInputs[index - 1];
+                     if (prevInput) {
+                         prevInput.focus();
+                     }
+                 }
+             });
+         });
+
 
         // --- Filtering and Rendering ---
         function filterAndRenderBags() {
@@ -1381,31 +1891,6 @@
             });
              console.log("filterAndRenderBags finished."); // Debug log
         }
-
-        // Add event listeners to category filter buttons to update filter and re-render
-        categoryFilterButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                // Remove 'active' class from all buttons and add to the clicked one
-                categoryFilterButtons.forEach(btn => btn.classList.remove('active'));
-                button.classList.add('active');
-                // Update the current category and trigger filtering and rendering
-                currentCategory = button.dataset.category;
-                filterAndRenderBags();
-            });
-        });
-
-        // Add event listeners for the search button and input field
-        searchButton.addEventListener('click', () => {
-            currentSearchTerm = searchInput.value;
-            filterAndRenderBags();
-        });
-        searchInput.addEventListener('keyup', (event) => {
-            // Trigger search on Enter key press
-            if (event.key === 'Enter') {
-                currentSearchTerm = searchInput.value;
-                filterAndRenderBags();
-            }
-        });
 
         // --- Modal and Cart Functions ---
         // Function to show restaurant details in the modal
@@ -1503,21 +1988,27 @@
             } else if (view === 'cart') {
                 cartView.classList.add('active');
                 modalBackButton.classList.remove('hidden'); // Show back button
+                modalBackButton.onclick = () => switchModalView('bagMenuDetail'); // Back button goes to bag/menu view
                 renderCartItems(); // Render cart items when navigating to the cart view
                 renderCartSuggestions(); // Render suggestions when navigating to the cart view
             } else if (view === 'checkoutAddress') {
                  checkoutAddressView.classList.add('active');
                  modalBackButton.classList.remove('hidden');
+                 modalBackButton.onclick = () => switchModalView('cart'); // Back button goes to cart
                  // Ensure delivery address fields visibility is correct based on initial radio state
                  updateDeliveryAddressFieldsVisibility();
             } else if (view === 'checkoutTime') {
                  checkoutTimeView.classList.add('active');
                  modalBackButton.classList.remove('hidden');
+                 modalBackButton.onclick = () => switchModalView('checkoutAddress'); // Back button goes to address
                  populateTimeOptions(); // Populate time options based on delivery/pickup selection
                  updateDeliveryPriorityVisibility(); // Update delivery priority visibility
             } else if (view === 'checkoutPayment') {
                  checkoutPaymentView.classList.add('active');
                  modalBackButton.classList.remove('hidden');
+                 modalBackButton.onclick = () => switchModalView('checkoutTime'); // Back button goes to time
+                 // Ensure dummy payment fields visibility is correct based on initial radio state
+                 updateDummyPaymentFieldsVisibility();
             }
 
             currentModalView = view; // Update the state variable for the current view
@@ -1680,7 +2171,7 @@
                 const bagItemHtml = `
                     <div class="flex justify-between items-center border-b pb-2">
                         <div>
-                            <p class="font-semibold text-gray-800">${currentRestaurantData.bagName} (${bag.size})</p>
+                            <p class="font-semibold text-gray-800">${currentRestaurantData.restaurantName} - ${bag.bagName} (${bag.size})</p>
                             <p class="text-xs text-gray-600">${bag.type}</p>
                         </div>
                         <div class="flex items-center gap-2">
@@ -1699,7 +2190,7 @@
                      total += itemPrice;
                      const menuItemHtml = `
                          <div class="flex justify-between items-center border-b pb-2">
-                             <p class="text-gray-700">${item.name}</p>
+                              <p class="text-gray-700">${currentRestaurantData.restaurantName} - ${item.name}</p>
                              <div class="flex items-center gap-2">
                                  <p class="text-base text-gray-600">${item.price}</p>
                                  <button class="remove-item-btn" onclick="removeFromCart('menuItem', '${item.id}')">Remove</button>
@@ -1816,6 +2307,35 @@
                  return;
              }
 
+            // Capture dummy payment details based on selected method
+            let paymentDetails = {};
+            if (paymentMethod === 'card') {
+                 paymentDetails.card = {
+                     number: cardNumberInput.value.trim(),
+                     expiry: expiryDateInput.value.trim(),
+                     cvv: cvvInput.value.trim(),
+                     name: cardNameInput.value.trim()
+                 };
+                 // Basic dummy validation for card fields
+                 if (!paymentDetails.card.number || !paymentDetails.card.expiry || !paymentDetails.card.cvv || !paymentDetails.card.name) {
+                      modalMessage.textContent = 'Please fill in all dummy card details.';
+                      modalMessage.className = 'text-center mt-4 text-sm text-yellow-600';
+                      return;
+                 }
+            } else if (paymentMethod === 'upi') {
+                 paymentDetails.upi = {
+                     id: upiIdInput.value.trim(),
+                     app: upiAppSelect.value
+                 };
+                 // Basic dummy validation for UPI fields
+                 if (!paymentDetails.upi.id || !paymentDetails.upi.app) {
+                     modalMessage.textContent = 'Please fill in dummy UPI ID and select an app.';
+                     modalMessage.className = 'text-center mt-4 text-sm text-yellow-600';
+                     return;
+                 }
+            }
+
+
             // Construct a simulated order object
             const newOrder = {
                 id: orderHistory.length + 1, // Simple incremental ID
@@ -1831,6 +2351,7 @@
                 preferredTime: preferredTime,
                 deliveryPriority: selectedDeliveryOption === 'delivery' ? selectedDeliveryPriority : 'N/A',
                 paymentMethod: paymentMethod,
+                paymentDetails: paymentDetails, // Save the captured dummy payment details
                 total: cartTotalSpan.textContent.replace('Total: ₹', ''), // Capture the total price
                 date: new Date().toLocaleDateString(), // Add current date
                 status: 'placed' // Initial status
@@ -1843,21 +2364,41 @@
             updateCartItemCount();
             saveCartToLocalStorage(); // Clear persistent cart
 
-            // Reset checkout form fields
+            // Reset checkout form fields and dummy payment fields
             addressInput.value = '';
             dropoffTextarea.value = '';
             document.getElementById('optionPickup').checked = true;
             document.getElementById('priorityRegular').checked = true;
             updateDeliveryAddressFieldsVisibility();
             updateDeliveryPriorityVisibility();
-            pickupTimeSelect.innerHTML = '';
+            populateTimeOptions(); // Reset time options
             document.querySelectorAll('input[name="paymentMethod"]').forEach(radio => radio.checked = false);
+            cardNumberInput.value = '';
+            expiryDateInput.value = '';
+            cvvInput.value = '';
+            cardNameInput.value = '';
+            upiIdInput.value = '';
+            upiAppSelect.value = '';
+            updateDummyPaymentFieldsVisibility(); // Hide dummy fields
+
 
             // Show the order progress view for the new order
             closeModal(); // Close the checkout modal
             showOrderProgress(newOrder.id); // Show the order progress view
 
+             // Simulate sending order confirmation message
+             if (userData && userData.phone) {
+                 // In a real app, this would be an API call to send an SMS
+                 console.log(`Simulating Order Confirmation SMS to ${userData.phone} for Order #${newOrder.id}`);
+                 // Display a temporary message to the user
+                 const confirmationMessage = `Order #${newOrder.id} placed successfully! Confirmation sent to ${userData.phone}.`;
+                 // Using alert for simplicity in this simulation
+                 alert(confirmationMessage);
+             }
+
+
              // Simulate order status updates over time (basic example)
+             // These timeouts will trigger the animation by adding the 'completed' class
              setTimeout(() => { updateOrderProgressSteps('preparing'); }, 3000); // After 3 seconds
              setTimeout(() => { updateOrderProgressSteps('out'); }, 8000); // After 8 seconds
              setTimeout(() => { updateOrderProgressSteps('delivered'); }, 15000); // After 15 seconds
@@ -1880,15 +2421,22 @@
              // updateCartItemCount(); // Don't reset cart count here, it reflects the persistent cart now
              currentRestaurantData = null; // Clear the stored restaurant data
 
-             // Reset checkout form fields
+             // Reset checkout form fields and dummy payment fields
              addressInput.value = '';
              dropoffTextarea.value = '';
              document.getElementById('optionPickup').checked = true;
              document.getElementById('priorityRegular').checked = true;
              updateDeliveryAddressFieldsVisibility();
              updateDeliveryPriorityVisibility();
-             pickupTimeSelect.innerHTML = '';
+             populateTimeOptions(); // Reset time options
              document.querySelectorAll('input[name="paymentMethod"]').forEach(radio => radio.checked = false);
+             cardNumberInput.value = '';
+             expiryDateInput.value = '';
+             cvvInput.value = '';
+             cardNameInput.value = '';
+             upiIdInput.value = '';
+             upiAppSelect.value = '';
+             updateDummyPaymentFieldsVisibility(); // Hide dummy fields
         }
 
         // Add event listeners to close the modal
@@ -1940,6 +2488,20 @@
              }
         }
 
+        // Function to toggle visibility of dummy payment input fields based on selected payment method
+        function updateDummyPaymentFieldsVisibility() {
+             const selectedPaymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value;
+
+             cardDetailsDiv.classList.add('hidden');
+             upiDetailsDiv.classList.add('hidden');
+
+             if (selectedPaymentMethod === 'card') {
+                 cardDetailsDiv.classList.remove('hidden');
+             } else if (selectedPaymentMethod === 'upi') {
+                 upiDetailsDiv.classList.remove('hidden');
+             }
+        }
+
 
         // Add event listeners to the delivery option radio buttons
         deliveryOptionRadios.forEach(radio => {
@@ -1949,6 +2511,12 @@
                 populateTimeOptions(); // Repopulate time options based on selection
             });
         });
+
+         // Add event listeners to the payment method radio buttons
+         paymentMethodRadios.forEach(radio => {
+             radio.addEventListener('change', updateDummyPaymentFieldsVisibility);
+         });
+
 
         // --- User Account Functions ---
         function renderPersistentCart() {
@@ -1966,12 +2534,14 @@
                  persistentCartActions.classList.remove('hidden');
                  if (hasBag) {
                      const bag = currentModalCart.bag;
+                     // Find the restaurant data for the bag to get the image URL
+                     const bagRestaurant = mysteryBagsData.find(r => r.id === bag.id); // Assuming bag.id matches restaurant id for simplicity
                       const bagItemHtml = `
                          <div class="persistent-cart-item">
                              <div class="item-details">
-                                 <img src="${currentRestaurantData ? currentRestaurantData.imageUrl : 'https://placehold.co/50x50/eee/333?text=Bag'}" alt="${bag.bagName}">
+                                 <img src="${bagRestaurant ? bagRestaurant.imageUrl : 'https://placehold.co/50x50/eee/333?text=Bag'}" alt="${bag.bagName}">
                                  <div class="item-info">
-                                     <span>${bag.bagName} (${bag.size})</span>
+                                     <span>${bagRestaurant ? bagRestaurant.restaurantName + ' - ' : ''}${bag.bagName} (${bag.size})</span>
                                      <span class="price">${bag.price}</span>
                                  </div>
                              </div>
@@ -1981,12 +2551,14 @@
                  }
                  if (hasMenuItems) {
                      currentModalCart.menuItems.forEach(item => {
+                          // Find the restaurant data for the menu item (assuming it's from the same restaurant as the bag if a bag exists, otherwise need to store restaurant ID with menu item)
+                          const itemRestaurant = currentRestaurantData || (currentModalCart.bag ? mysteryBagsData.find(r => r.id === currentModalCart.bag.id) : null); // Simplified
                           const menuItemHtml = `
                              <div class="persistent-cart-item">
                                  <div class="item-details">
                                      <img src="https://placehold.co/50x50/eee/333?text=Item" alt="${item.name}">
                                      <div class="item-info">
-                                         <span>${item.name}</span>
+                                         <span>${itemRestaurant ? itemRestaurant.restaurantName + ' - ' : ''}${item.name}</span>
                                          <span class="price">${item.price}</span>
                                      </div>
                                  </div>
@@ -2023,7 +2595,10 @@
             if (orderHistory.length === 0) {
                  orderHistoryItemsContainer.innerHTML = `<p class="text-center text-gray-500">No past orders found.</p>`;
             } else {
-                orderHistory.forEach(order => {
+                // Sort orders by ID in descending order (most recent first)
+                const sortedOrderHistory = [...orderHistory].sort((a, b) => b.id - a.id);
+
+                sortedOrderHistory.forEach(order => {
                     let itemSummary = '';
                     if (order.items.bag) {
                         itemSummary += `${order.items.bag.bagName} (${order.items.bag.size})`;
@@ -2042,9 +2617,12 @@
                              <div class="order-details">
                                  Items: ${itemSummary || 'N/A'}
                              </div>
-                             <div class="flex justify-between items-center">
+                             <div class="flex justify-between items-center mt-2">
                                  <span class="order-total">Total: ₹${order.total}</span>
                                  <span class="order-status ${order.status}">${order.status.charAt(0).toUpperCase() + order.status.slice(1)}</span>
+                             </div>
+                             <div class="flex justify-end mt-2">
+                                  <button class="view-receipt-button" onclick="showReceiptDetails(${order.id})">View Receipt</button>
                              </div>
                         </div>
                     `;
@@ -2070,6 +2648,27 @@
             modalMessage.className = 'text-center mt-4 text-sm text-green-600';
             setTimeout(() => { modalMessage.textContent = ''; modalMessage.className = 'text-center mt-4 text-sm text-gray-500'; }, 2000);
         }
+
+        function updateGreetingUserName() {
+            if (userData && userData.name) {
+                greetingUserNameSpan.textContent = userData.name;
+            } else {
+                greetingUserNameSpan.textContent = 'User'; // Default if no user data or name
+            }
+        }
+
+        // Function to handle user sign out
+        function signOut() {
+            userData = null; // Clear user data
+            localStorage.removeItem('mystimealUserData'); // Remove from local storage
+            currentModalCart = { bag: null, menuItems: [] }; // Clear current cart
+            localStorage.removeItem('mystimealCart'); // Clear persistent cart
+            orderHistory = []; // Clear order history (optional, can keep history)
+            localStorage.removeItem('mystimealOrderHistory'); // Remove history from local storage
+            showAuthScreen(); // Go back to the authentication screen
+            alert('You have been signed out.'); // Provide feedback
+        }
+
 
         // --- Order Progress Functions ---
         function updateOrderProgressSteps(status) {
@@ -2099,9 +2698,64 @@
 
 
         // --- Initial Load ---
-        // Note: Initial rendering of bags on the main screen happens after the login button is clicked.
-        // Load persistent cart data when the page loads (before login)
-        loadCartFromLocalStorage();
+        // Wait for the DOM to be fully loaded before accessing elements
+        document.addEventListener('DOMContentLoaded', () => {
+             // Check if user data exists on load. If so, show main content, otherwise show auth screen.
+             if (userData) {
+                 showMainAppContent();
+             } else {
+                 showAuthScreen();
+             }
+
+            // Get references to filtering and search elements AFTER DOM is loaded
+            const categoryFilterButtons = document.querySelectorAll('.category-button');
+            const searchInput = document.getElementById('restaurantSearchInput');
+            const searchButton = document.getElementById('searchButton');
+
+            // Add event listeners to category filter buttons to update filter and re-render
+            categoryFilterButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    // Remove 'active' class from all buttons and add to the clicked one
+                    categoryFilterButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    // Update the current category and trigger filtering and rendering
+                    currentCategory = button.dataset.category;
+                    filterAndRenderBags();
+                });
+            });
+
+            // Add event listeners for the search button and input field
+            searchButton.addEventListener('click', () => {
+                currentSearchTerm = searchInput.value;
+                filterAndRenderBags();
+            });
+            searchInput.addEventListener('keyup', (event) => {
+                // Trigger search on Enter key press
+                if (event.key === 'Enter') {
+                    currentSearchTerm = searchInput.value;
+                    filterAndRenderBags();
+                }
+            });
+
+             // Add event listeners to the delivery option radio buttons (moved inside DOMContentLoaded)
+             deliveryOptionRadios.forEach(radio => {
+                 radio.addEventListener('change', () => {
+                     updateDeliveryAddressFieldsVisibility();
+                     updateDeliveryPriorityVisibility();
+                     populateTimeOptions(); // Repopulate time options based on selection
+                 });
+             });
+
+              // Add event listeners to the payment method radio buttons (moved inside DOMContentLoaded)
+              paymentMethodRadios.forEach(radio => {
+                  radio.addEventListener('change', updateDummyPaymentFieldsVisibility);
+              });
+
+        });
+
+
+        // Removed the service worker registration code as it's not needed for this single HTML file simulation
+
 
     </script>
 </body>
